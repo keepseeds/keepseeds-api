@@ -3,6 +3,10 @@ from core.rest_response import RestResponse
 
 class TestRestResponse(unittest.TestCase):
     def test_should_map_all_properties(self):
+        """
+        Assert that all properties are mapped correctly to properties on the
+        object.
+        """
         # Arrange, Act
         response = RestResponse(
             200,
@@ -19,6 +23,10 @@ class TestRestResponse(unittest.TestCase):
         self.assertEqual(response.is_success, True)
 
     def test_should_map_to_dictionary_via_json_with_status(self):
+        """
+        Assert that when a status code is passed in, the json() output returns
+        a tuple including the status code.
+        """
         # Arrange
         response = RestResponse(
             201,
@@ -28,6 +36,7 @@ class TestRestResponse(unittest.TestCase):
             False
         )
 
+        # Act
         json_response = response.json()
         data = json_response[0]
         response_code = json_response[1]
@@ -41,6 +50,10 @@ class TestRestResponse(unittest.TestCase):
         self.assertEqual(data['isSuccess'], False)
 
     def test_should_map_to_dictionary_via_json_without_status(self):
+        """
+        Check that without a status code, the json function doesn't return
+        a tuple including the status code.
+        """
         # Arrange
         response = RestResponse(
             None,
@@ -56,6 +69,10 @@ class TestRestResponse(unittest.TestCase):
         self.assertRaises(KeyError, lambda: json_response['code'])
 
     def test_should_map_to_dictionary_via_json_without_properties(self):
+        """
+        Assert that when each parameter is passed None, it does not appear
+        in the json() output.
+        """
         # Arrange
         response = RestResponse(
             None,
