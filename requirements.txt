@@ -23,6 +23,7 @@ MarkupSafe==1.0
 mccabe==0.6.1
 oauthlib==2.0.2
 passlib==1.7.1
+psycopg2==2.7.1
 pycparser==2.18
 PyJWT==1.4.2
 pylint==1.7.2

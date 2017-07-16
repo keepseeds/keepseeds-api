@@ -12,7 +12,7 @@ from resources.register_resource import Register
 
 # Constants
 DB_KEY = 'DATABASE_URL'
-DB_LOCAL_PATH = 'sqlite:///data.db'
+DB_LOCAL_PATH = 'postgresql://localhost/andy'
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('APP_SECRET', 'TEST_SECRET')
