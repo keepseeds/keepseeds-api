@@ -2,3 +2,5 @@
 venv
 
 \.vscode/tags
+
+data\.db
