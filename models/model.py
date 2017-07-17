@@ -85,6 +85,21 @@ class User(db.Model, Base):
 
         return new_user.id
 
+    @classmethod
+    def update_password(cls, email, password):
+        """
+        Update password of user with provided email.
+        """
+        user = cls.find_by_email(email)
+
+        if not user:
+            return False
+
+        user.encrypt_password(password)
+        db.session.commit()
+        
+        return True
+
 
 class Grant(db.Model, Base):
     """

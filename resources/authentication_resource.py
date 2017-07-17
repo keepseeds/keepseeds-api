@@ -4,6 +4,8 @@ from models.model import User
 from security import get_access_token
 from helpers.reqparsers import account_authentication, oauth_authentication
 
+from core.exceptions.resource_exceptions import InvalidCredentialsError
+
 class AccountAuthentication(Resource):
     """
     Resource for account authentication.
@@ -16,9 +18,9 @@ class AccountAuthentication(Resource):
         user = User.find_by_email(args['email'])
 
         if user and user.verify_password(args['password']):
-            return get_access_token(user.id)
+            return get_access_token(user.id), 200
 
-        return {'message': 'Unable to validate user.'}
+        raise InvalidCredentialsError
 
 class OAuthAuthentication(Resource):
     """
@@ -32,7 +34,7 @@ class OAuthAuthentication(Resource):
         token = args['token']
 
         if not grant_type in ('facebook',):
-            return {'message': 'Grant Type not supported.'}
+            raise InvalidCredentialsError
 
         # 1. Ensure we support grantType provided
         # 2. Look up user based on token via 3rd party, ensure the access token
@@ -43,4 +45,4 @@ class OAuthAuthentication(Resource):
         #    local user id.
 
         # Handle req parse
-        return {'message': 'Not yet implemented.'}
+        raise NotImplementedError

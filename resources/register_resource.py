@@ -7,6 +7,8 @@ from werkzeug.security import safe_str_cmp
 
 from models.model import User
 from helpers.reqparsers.register import post_request_parser
+from core.exceptions.resource_exceptions import UnableToCompleteError,\
+                                                PasswordsDoNotMatchError
 
 class Register(Resource):
     """
@@ -27,11 +29,11 @@ class Register(Resource):
         password_confirm = args['passwordConfirm']
 
         if User.find_by_email(email):
-            return {'message': 'Unable to create user.'}
+            raise UnableToCompleteError
 
         if not safe_str_cmp(password, password_confirm):
-            return {'message': 'Passwords do not match.'}
+            raise PasswordsDoNotMatchError
 
-        user_id = User.create(email, first, last, password)
+        User.create(email, first, last, password)
 
-        return {'message': 'Created successfully, please log in.', "id": user_id}, 201
+        return 201
