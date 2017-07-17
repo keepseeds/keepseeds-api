@@ -31,10 +31,13 @@ class ChangePassword(Resource):
         if not user:
             raise UnableToCompleteError
 
+        if not user.verify_password(old_password):
+            raise UnableToCompleteError
+
         if not safe_str_cmp(password, password_confirm):
             raise PasswordsDoNotMatchError
 
-        if User.update_password(email, old_password):
+        if User.update_password(email, password):
             return 204
 
-        raise NotImplementedError
+        raise UnableToCompleteError
