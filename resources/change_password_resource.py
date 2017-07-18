@@ -2,14 +2,14 @@
 Module for the ChangePassword class, this class interacts
 with the database via SQLAlchemy.
 """
+from exceptions import UnableToCompleteError, PasswordsDoNotMatchError
 from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import jwt_required
 
-from models.model import User
+from models import User
 from helpers.reqparsers.change_password import put_request_parser
-from core.exceptions.resource_exceptions import UnableToCompleteError,\
-                                                PasswordsDoNotMatchError
+
 
 class ChangePassword(Resource):
     """

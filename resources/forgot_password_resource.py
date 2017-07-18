@@ -1,10 +1,8 @@
+
+from exceptions import UnableToCompleteError, PasswordsDoNotMatchError
 from flask_restful import Resource
-from models.model import User
+from models import User
 from werkzeug.security import safe_str_cmp
-
-from core.exceptions.resource_exceptions import UnableToCompleteError,\
-                                                PasswordsDoNotMatchError
-
 from helpers.reqparsers.forgot_password import put_request_parser,\
                                                post_request_parser
 

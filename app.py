@@ -3,15 +3,13 @@ Main entry point for the application, this is
 accessed as '__main__' when developing locally.
 """
 import os
+from exceptions import resource_errors
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from core.exceptions.resource_exceptions import resource_errors
-
-from resources.authentication_resource import AccountAuthentication, OAuthAuthentication
-from resources.register_resource import Register
-from resources.change_password_resource import ChangePassword
+from resources import AccountAuthentication, OAuthAuthentication,\
+                      Register, ChangePassword
 
 # Constants
 DB_KEY = 'DATABASE_URL'

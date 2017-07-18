@@ -3,8 +3,7 @@ Module for the UserResource class, this class interacts
 with the database via SQLAlchemy.
 """
 from flask_restful import Resource
-from core.rest_response import NotFoundResponse, SuccessResponse
-from models.user_model import UserModel
+from models import User
 
 
 class UserResource(Resource):
@@ -13,10 +12,10 @@ class UserResource(Resource):
     """
 
     def get(self, id):
-        return SuccessResponse('')
+        pass
 
     def post(self, id):
-        return NotFoundResponse().json()
+        pass
 
     def put(self, id):
         pass

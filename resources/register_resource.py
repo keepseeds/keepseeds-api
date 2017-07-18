@@ -2,13 +2,12 @@
 Module for the Register class, this class interacts
 with the database via SQLAlchemy.
 """
+from exceptions import UnableToCompleteError, PasswordsDoNotMatchError
 from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
 
-from models.model import User
+from models import User
 from helpers.reqparsers.register import post_request_parser
-from core.exceptions.resource_exceptions import UnableToCompleteError,\
-                                                PasswordsDoNotMatchError
 
 class Register(Resource):
     """

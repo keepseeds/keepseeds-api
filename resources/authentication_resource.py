@@ -1,10 +1,11 @@
 
+from exceptions import InvalidCredentialsError
 from flask_restful import Resource
-from models.model import User
+from models import User
 from security import get_access_token
 from helpers.reqparsers import account_authentication, oauth_authentication
 
-from core.exceptions.resource_exceptions import InvalidCredentialsError
+
 
 class AccountAuthentication(Resource):
     """
