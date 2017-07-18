@@ -1,6 +1,6 @@
 from flask_restful import reqparse
 
-def put_request_parser():
+def rp_put_forgot_password():
     """
     [PUT] Forgot Password Parser
 
@@ -12,7 +12,7 @@ def put_request_parser():
 
     return parser
 
-def post_request_parser():
+def rp_post_forgot_password():
     """
     [PUT] Forgot Password Parser
 

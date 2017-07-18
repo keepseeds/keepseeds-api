@@ -1,14 +1,23 @@
 
-from exceptions import UnableToCompleteError, PasswordsDoNotMatchError
 from flask_restful import Resource
-from models import User
 from werkzeug.security import safe_str_cmp
-from helpers.reqparsers.forgot_password import put_request_parser,\
-                                               post_request_parser
+
+from models import User
+from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
+from helpers.reqparsers import rp_put_forgot_password, rp_post_forgot_password
 
 class ForgotPassword(Resource):
-    put_parser = put_request_parser()
-    post_parser = post_request_parser()
+    """
+    Resource for recovering a forgotten password.
+
+    The pattern for this endpoint:
+    1. User submits email to the PUT endpoint, this send the user an email with
+       a generated token that is saved to the database with an expiry date (24h).
+    2. User retrieves the token from their email and submits it to the POST
+       endpoint along with their username, new password and matching confirmation.
+    """
+    put_parser = rp_put_forgot_password()
+    post_parser = rp_post_forgot_password()
 
     def post(self):
         args = self.post_parser.parse_args()

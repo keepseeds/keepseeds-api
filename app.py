@@ -3,13 +3,12 @@ Main entry point for the application, this is
 accessed as '__main__' when developing locally.
 """
 import os
-from exceptions import resource_errors
+from helpers.errors import resource_errors
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from resources import AccountAuthentication, OAuthAuthentication,\
-                      Register, ChangePassword
+from resources import AccountAuth, OAuth, Register, ChangePassword
 
 # Constants
 DB_KEY = 'DATABASE_URL'
@@ -24,8 +23,8 @@ api = Api(app, errors=resource_errors)
 
 JWTManager(app)
 
-api.add_resource(AccountAuthentication, '/auth')
-api.add_resource(OAuthAuthentication, '/oauth')
+api.add_resource(AccountAuth, '/auth')
+api.add_resource(OAuth, '/oauth')
 api.add_resource(Register, '/register')
 api.add_resource(ChangePassword, '/change-password')
 

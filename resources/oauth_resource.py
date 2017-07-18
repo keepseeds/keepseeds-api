@@ -1,33 +1,15 @@
 
-from exceptions import InvalidCredentialsError
 from flask_restful import Resource
 from models import User
 from security import get_access_token
-from helpers.reqparsers import account_authentication, oauth_authentication
+from helpers.errors import InvalidCredentialsError
+from helpers.reqparsers import rp_post_oauth
 
-
-
-class AccountAuthentication(Resource):
-    """
-    Resource for account authentication.
-    """
-    parser = account_authentication.post_request_parser()
-
-    def post(self):
-        args = self.parser.parse_args()
-
-        user = User.find_by_email(args['email'])
-
-        if user and user.verify_password(args['password']):
-            return get_access_token(user.id), 200
-
-        raise InvalidCredentialsError
-
-class OAuthAuthentication(Resource):
+class OAuth(Resource):
     """
     Resource for OAuth authentication.
     """
-    parser = oauth_authentication.post_request_parser()
+    parser = rp_post_oauth()
 
     def post(self):
         args = self.parser.parse_args()

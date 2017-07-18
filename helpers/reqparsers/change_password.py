@@ -1,7 +1,7 @@
 
 from flask_restful import reqparse
 
-def put_request_parser():
+def rp_put_change_password():
     """
     [PUT] Change Password Parser
 

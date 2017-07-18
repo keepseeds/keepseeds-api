@@ -2,20 +2,20 @@
 Module for the ChangePassword class, this class interacts
 with the database via SQLAlchemy.
 """
-from exceptions import UnableToCompleteError, PasswordsDoNotMatchError
 from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import jwt_required
 
 from models import User
-from helpers.reqparsers.change_password import put_request_parser
+from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
+from helpers.reqparsers import rp_put_change_password
 
 
 class ChangePassword(Resource):
     """
     Represents a ChangePassword resource in the API.
     """
-    put_parser = put_request_parser()
+    put_parser = rp_put_change_password()
 
     @jwt_required
     def put(self):
@@ -38,6 +38,6 @@ class ChangePassword(Resource):
             raise PasswordsDoNotMatchError
 
         if User.update_password(email, password):
-            return 204
+            return {'message': 'Done.'}, 204
 
         raise UnableToCompleteError

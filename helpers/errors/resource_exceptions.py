@@ -1,3 +1,9 @@
+"""
+Exceptions in this module relate to Resource errors.
+
+Most commonly this will include exceptions to be thrown via Flask-RESTful
+and should therefore be added to resource_errors.
+"""
 from flask_restful import HTTPException
 
 ##

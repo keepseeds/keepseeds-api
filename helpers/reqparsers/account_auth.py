@@ -3,7 +3,7 @@ Request parsers for AccountAuthentication resource.
 """
 from flask_restful import reqparse
 
-def post_request_parser():
+def rp_post_account_authentication():
     """
     [POST] Account Authentication Parser
 

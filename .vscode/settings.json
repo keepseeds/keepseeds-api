@@ -2,5 +2,14 @@
     "editor.tabSize": 4,
     "editor.rulers": [
         80
-    ]
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/*.pyc": true,
+        "**/venv": true
+    }
 }

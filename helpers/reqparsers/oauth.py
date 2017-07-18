@@ -1,10 +1,10 @@
 """
-Request parsers for OAuthAuthentication resource.
+Request parsers for OAuth resource.
 """
 
 from flask_restful import reqparse
 
-def post_request_parser():
+def rp_post_oauth():
     """
     [POST] OAuth Authentication Parser
 
