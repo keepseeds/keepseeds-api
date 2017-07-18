@@ -3,7 +3,7 @@ Module for the User class, this class interacts
 with the database via SQLAlchemy.
 """
 from db import db
-from models.mixins.base import Base
+from models.mixins import Base
 from passlib.hash import pbkdf2_sha256
 
 user_grants = db.Table('user_grants',
