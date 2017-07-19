@@ -3,8 +3,9 @@ Module for the User class, this class interacts
 with the database via SQLAlchemy.
 """
 from db import db
-from models.mixins import Base
 from passlib.hash import pbkdf2_sha256
+
+from models.mixins import Base
 
 user_grants = db.Table('user_grants',
                        db.Column('uid', db.Integer),
@@ -16,7 +17,17 @@ user_grants = db.Table('user_grants',
                                  db.Integer,
                                  db.ForeignKey('grants.id'),
                                  primary_key=True)
-                      )
+                       )
+
+user_tokens = db.Table('user_tokens',
+                       db.Column('user_id',
+                                 db.Integer,
+                                 db.ForeignKey('users.id')),
+                       db.Column('token_id',
+                                 db.Integer,
+                                 db.ForeignKey('tokens.id')),
+                       )
+
 
 class User(db.Model, Base):
     """
@@ -30,11 +41,18 @@ class User(db.Model, Base):
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     password_hash = db.Column(db.String(4000))
-    is_verified_email = db.Column(db.Boolean())
+    is_verified_email = db.Column(db.Boolean)
+    is_locked = db.Column(db.Boolean)
 
     grants = db.relationship(
         'Grant',
         secondary=user_grants,
+        back_populates='users'
+    )
+
+    tokens = db.relationship(
+        'Token',
+        secondary=user_tokens,
         back_populates='users'
     )
 
@@ -43,6 +61,7 @@ class User(db.Model, Base):
         self.first_name = first
         self.last_name = last
         self.is_verified_email = False
+        self.is_locked = False
         self.encrypt_password(password)
 
     def encrypt_password(self, password):
@@ -58,21 +77,33 @@ class User(db.Model, Base):
         """
         return pbkdf2_sha256.verify(password, self.password_hash)
 
+    def set_is_locked(self, is_locked=True):
+        """
+        Set the user's locked state.
+        """
+        self.is_locked = is_locked
+        db.session.commit()
+
     @classmethod
-    def find_by_email(cls, email):
+    def find_by_email(cls, email, is_locked=False, delete_date_time=None):
         """
         Find a single User based on email address.
         """
-        print(cls)
-        print(cls.query)
-        return cls.query.filter_by(email=email).first()
+        res = cls.query;
+        res.filter_by(email=email,
+                      is_locked=is_locked,
+                      delete_date_time=delete_date_time)
+
+        return res.first()
 
     @classmethod
-    def find_by_id(cls, _id):
+    def find_by_id(cls, _id, is_locked=False, delete_date_time=None):
         """
         Find a single User based on id.
         """
-        return cls.query.filter_by(id=_id).first()
+        return cls.query.filter_by(id=_id,
+                                   is_locked=is_locked,
+                                   delete_date_time=delete_date_time).first()
 
     @classmethod
     def create(cls, email, first, last, password):
@@ -113,3 +144,17 @@ class Grant(db.Model, Base):
     users = db.relationship('User',
                             secondary=user_grants,
                             back_populates='grants')
+
+
+class Token(db.Model, Base):
+    """
+    Database representation of a Token.
+    """
+
+    # SQLAlchemy Configuration
+    __tablename__ = 'tokens'
+
+    name = db.Column(db.String(100), nullable=False)
+    users = db.relationship('User',
+                            secondary=user_tokens,
+                            back_populates='tokens')

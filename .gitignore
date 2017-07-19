@@ -4,3 +4,5 @@ venv
 \.vscode/tags
 
 data\.db
+
+data\.db-journal
