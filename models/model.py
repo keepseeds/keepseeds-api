@@ -26,6 +26,8 @@ user_tokens = db.Table('user_tokens',
                        db.Column('token_id',
                                  db.Integer,
                                  db.ForeignKey('tokens.id')),
+                       db.Column('token', db.String(100), primary_key=True, nullable=False),
+                       db.Column('expires_date_time', db.DateTime, nullable=False),
                        )
 
 
