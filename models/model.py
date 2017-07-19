@@ -7,29 +7,28 @@ from passlib.hash import pbkdf2_sha256
 
 from models.mixins import Base
 
-user_grants = db.Table('user_grants',
-                       db.Column('uid', db.Integer),
-                       db.Column('user_id',
-                                 db.Integer,
-                                 db.ForeignKey('users.id'),
-                                 primary_key=True),
-                       db.Column('grant_id',
-                                 db.Integer,
-                                 db.ForeignKey('grants.id'),
-                                 primary_key=True)
-                       )
+# http://docs.sqlalchemy.org/en/latest/orm/basic_relationships.html#association-object
 
-user_tokens = db.Table('user_tokens',
-                       db.Column('user_id',
-                                 db.Integer,
-                                 db.ForeignKey('users.id')),
-                       db.Column('token_id',
-                                 db.Integer,
-                                 db.ForeignKey('tokens.id')),
-                       db.Column('token', db.String(100), primary_key=True, nullable=False),
-                       db.Column('expires_date_time', db.DateTime, nullable=False),
-                       )
+class UserGrant(db.Model, Base):
+    __tablename__ = 'user_grants'
 
+    uid = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    grant_id = db.Column(db.Integer, db.ForeignKey('grants.id'), primary_key=True)
+
+    user = db.relationship('User', back_populates='users')
+    grant = db.relationship('Grant', back_populates='grants')
+
+class UserToken(db.Model, Base):
+    __tablename__ = 'user_tokens'
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    token_id = db.Column(db.Integer, db.ForeignKey('tokens.id'))
+    token_value = db.Column(db.String(100), unique=True, nullable=False)
+    expires_date_time = db.Column(db.DateTime, nullable=False)
+
+    user = db.relationship('User', back_populates='users')
+    token = db.relationship('Token', back_populates='tokens')
 
 class User(db.Model, Base):
     """
@@ -57,6 +56,9 @@ class User(db.Model, Base):
         secondary=user_tokens,
         back_populates='users'
     )
+
+    user_grants = db.relationship('UserGrant', back_populates='user')
+    user_tokens = db.relationship('UserToken', back_populates='user')
 
     def __init__(self, email, first, last, password):
         self.email = email
@@ -147,6 +149,8 @@ class Grant(db.Model, Base):
                             secondary=user_grants,
                             back_populates='grants')
 
+    user_grants = db.relationship('UserGrant', back_populates='grant')
+
 
 class Token(db.Model, Base):
     """
@@ -157,6 +161,5 @@ class Token(db.Model, Base):
     __tablename__ = 'tokens'
 
     name = db.Column(db.String(100), nullable=False)
-    users = db.relationship('User',
-                            secondary=user_tokens,
-                            back_populates='tokens')
+
+    user_tokens = db.relationship('UserToken', back_populates='token')
