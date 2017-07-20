@@ -6,9 +6,10 @@ and should therefore be added to resource_errors.
 """
 from flask_restful import HTTPException
 
-##
-## Custom Exception Types
-##
+#
+# Custom Exception Types
+#
+
 
 class UnableToCompleteError(HTTPException):
     """
@@ -16,11 +17,13 @@ class UnableToCompleteError(HTTPException):
     """
     code = 400
 
+
 class PasswordsDoNotMatchError(HTTPException):
     """
     Password comparison has failed.
     """
     code = 400
+
 
 class InvalidCredentialsError(HTTPException):
     """
@@ -28,9 +31,9 @@ class InvalidCredentialsError(HTTPException):
     """
     code = 401
 
-##
-## Dictionary of Exception Types
-##
+#
+# Dictionary of Exception Types
+#
 
 resource_errors = {
     'UnableToCompleteError': {

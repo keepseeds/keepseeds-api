@@ -8,7 +8,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from resources import AccountAuth, OAuth, Register, ChangePassword
+from resources import AccountAuth, OAuth, Register, ChangePassword, ResetPassword
 
 # Constants
 DB_KEY = 'DATABASE_URL'
@@ -27,6 +27,7 @@ api.add_resource(AccountAuth, '/auth')
 api.add_resource(OAuth, '/oauth')
 api.add_resource(Register, '/register')
 api.add_resource(ChangePassword, '/change-password')
+api.add_resource(ResetPassword, '/reset-password')
 
 if __name__ == '__main__':
     from db import db

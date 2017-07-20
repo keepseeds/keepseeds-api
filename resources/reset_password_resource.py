@@ -2,11 +2,13 @@
 from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
 
-from models import User
+from models import User, Token, UserToken
+from models.enums import TokenType
 from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
-from helpers.reqparsers import rp_put_forgot_password, rp_post_forgot_password
+from helpers.reqparsers import rp_put_reset_password, rp_post_reset_password
 
-class ForgotPassword(Resource):
+
+class ResetPassword(Resource):
     """
     Resource for recovering a forgotten password.
 
@@ -16,8 +18,8 @@ class ForgotPassword(Resource):
     2. User retrieves the token from their email and submits it to the POST
        endpoint along with their username, new password and matching confirmation.
     """
-    put_parser = rp_put_forgot_password()
-    post_parser = rp_post_forgot_password()
+    put_parser = rp_put_reset_password()
+    post_parser = rp_post_reset_password()
 
     def post(self):
         args = self.post_parser.parse_args()
@@ -31,15 +33,17 @@ class ForgotPassword(Resource):
         if not user:
             raise UnableToCompleteError
 
-        # 1. Validate email token
-        if not safe_str_cmp(token, 'f0ca1654-3b50-41f3-9cc9-64b6db5f3c20'):
+        validate_response = UserToken.validate_token(user.id, token)
+
+        if not validate_response.is_valid:
             raise UnableToCompleteError
 
         if not safe_str_cmp(password, password_confirm):
             raise PasswordsDoNotMatchError
 
         if User.update_password(email, password):
-            return 204
+            validate_response.user_token.expire()
+            return {'message': 'Done.'}, 204
 
         return 500
 
@@ -51,6 +55,13 @@ class ForgotPassword(Resource):
         if not user:
             raise UnableToCompleteError
 
-        # 1. Create email reset token here.
+        token = Token.find_by_token_type(TokenType.ResetPassword)
 
-        return 202
+        if not token:
+            raise UnableToCompleteError
+
+        new_user_token_id = UserToken.create(user, token)
+
+        # This currently returns the plain token but it will need to
+        # send it to the email provided.
+        return {'userTokenId': new_user_token_id}, 202

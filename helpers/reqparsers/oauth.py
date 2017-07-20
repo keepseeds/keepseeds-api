@@ -1,8 +1,8 @@
 """
 Request parsers for OAuth resource.
 """
-
 from flask_restful import reqparse
+
 
 def rp_post_oauth():
     """

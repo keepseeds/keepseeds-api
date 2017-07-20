@@ -1,8 +1,12 @@
+"""
+Request parsers for ResetPassword resource.
+"""
 from flask_restful import reqparse
 
-def rp_put_forgot_password():
+
+def rp_put_reset_password():
     """
-    [PUT] Forgot Password Parser
+    [PUT] Reset Password Parser
 
     Fields: email
     """
@@ -12,9 +16,10 @@ def rp_put_forgot_password():
 
     return parser
 
-def rp_post_forgot_password():
+
+def rp_post_reset_password():
     """
-    [PUT] Forgot Password Parser
+    [PUT] Reset Password Parser
 
     Fields: email, token, password, passwordConfirm
     """
