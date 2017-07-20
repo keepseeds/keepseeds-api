@@ -33,16 +33,18 @@ class ResetPassword(Resource):
         if not user:
             raise UnableToCompleteError
 
-        validate_response = UserToken.validate_token(user.id, token)
+        vr = UserToken.validate_token(user_id=user.id,
+                                      token=token,
+                                      token_type=TokenType.ResetPassword)
 
-        if not validate_response.is_valid:
+        if not vr.is_valid:
             raise UnableToCompleteError
 
         if not safe_str_cmp(password, password_confirm):
             raise PasswordsDoNotMatchError
 
         if User.update_password(email, password):
-            validate_response.user_token.expire()
+            vr.user_token.expire()
             return {'message': 'Done.'}, 204
 
         return 500

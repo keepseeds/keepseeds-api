@@ -93,7 +93,7 @@ class User(db.Model, Base):
         :param delete_date_time: Date at which the user has been deleted.
         :type delete_date_time: datetime
 
-        :rtype User: A matching user or None if not found.
+        :rtype: User
         """
         res = cls.query;
         res.filter_by(email=email,

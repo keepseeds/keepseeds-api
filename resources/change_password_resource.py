@@ -9,6 +9,7 @@ from flask_jwt_extended import jwt_required
 from models import User
 from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
 from helpers.reqparsers import rp_put_change_password
+from responses import DoneResponse
 
 
 class ChangePassword(Resource):
@@ -28,16 +29,13 @@ class ChangePassword(Resource):
 
         user = User.find_by_email(email)
 
-        if not user:
-            raise UnableToCompleteError
-
-        if not user.verify_password(old_password):
+        if not user or not user.verify_password(old_password):
             raise UnableToCompleteError
 
         if not safe_str_cmp(password, password_confirm):
             raise PasswordsDoNotMatchError
 
         if User.update_password(email, password):
-            return {'message': 'Done.'}, 204
+            return DoneResponse().json(), 204
 
         raise UnableToCompleteError
