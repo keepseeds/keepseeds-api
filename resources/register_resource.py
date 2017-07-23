@@ -35,4 +35,4 @@ class Register(Resource):
 
         create_user_result = User.create(email, first, last, password)
 
-        return {'verifyToken': create_user_result['token']}, 201
+        return create_user_result, 201

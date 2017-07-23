@@ -162,7 +162,7 @@ class User(db.Model, Base):
 
         verify_email_token = UserToken.create(new_user, token, token_expiry)
 
-        return {"userId": new_user.id, "token": verify_email_token}
+        return {"token": verify_email_token}
 
     @classmethod
     def update_password(cls, email, password):
