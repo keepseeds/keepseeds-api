@@ -33,6 +33,6 @@ class Register(Resource):
         if not safe_str_cmp(password, password_confirm):
             raise PasswordsDoNotMatchError
 
-        User.create(email, first, last, password)
+        create_user_result = User.create(email, first, last, password)
 
-        return 201
+        return {'verifyToken': create_user_result['token']}, 201
