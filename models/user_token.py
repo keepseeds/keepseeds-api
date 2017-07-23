@@ -4,7 +4,7 @@ import shortuuid
 from db import db
 from passlib.hash import pbkdf2_sha256
 from datetime import datetime, timedelta
-from models import User, Token
+from .token import Token
 from helpers.utilities import ValidateTokenResponse
 from .enums import TokenType
 from .mixins import Base
@@ -93,9 +93,7 @@ class UserToken(db.Model, Base):
         """
         ut = cls.query.filter_by(user_id=user_id,
                                  delete_date_time=None,
-                                 token_id=int(token_type))\
-                      .filter(UserToken.expires_date_time > datetime.utcnow())\
-                      .first()  # type: UserToken
+                                 token_id=int(token_type)).filter(UserToken.expires_date_time > datetime.utcnow()).first()  # type: UserToken
 
         return ValidateTokenResponse(ut and ut.verify_token(token), ut)
 

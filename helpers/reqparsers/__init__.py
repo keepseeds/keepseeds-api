@@ -8,3 +8,4 @@ from .oauth import rp_post_oauth
 from .change_password import rp_put_change_password
 from .reset_password import rp_post_reset_password, rp_put_reset_password
 from .register import rp_post_register
+from .verify_email import rp_post_verify_email

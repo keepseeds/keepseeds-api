@@ -2,11 +2,14 @@
 Module for the User class, this class interacts
 with the database via SQLAlchemy.
 """
+from datetime import datetime, timedelta
 from db import db
 from passlib.hash import pbkdf2_sha256
 
 from .mixins import Base
-from datetime import datetime
+from .enums import TokenType
+from .user_token import UserToken
+from .token import Token
 
 
 class User(db.Model, Base):
@@ -79,6 +82,17 @@ class User(db.Model, Base):
         self.is_locked = is_locked
         db.session.commit()
 
+    def set_is_verified_email(self, is_verified_email=True):
+        """
+        Set the user's verified email state.
+        :param is_verified_email:
+        :return:
+        """
+        self.is_verified_email = is_verified_email
+        db.session.commit()
+
+        return True
+
     @classmethod
     def find_by_email(cls, email, is_locked=False, delete_date_time=None):
         """
@@ -95,10 +109,9 @@ class User(db.Model, Base):
 
         :rtype: User
         """
-        res = cls.query;
-        res.filter_by(email=email,
-                      is_locked=is_locked,
-                      delete_date_time=delete_date_time)
+        res = cls.query.filter_by(email=email,
+                   is_locked=is_locked,
+                   delete_date_time=delete_date_time)
 
         return res.first()
 
@@ -138,13 +151,18 @@ class User(db.Model, Base):
         :param password: Password to assign to user.
         :type password: str
 
-        :rtype int
+        :rtype: dict
         """
         new_user = cls(email, first, last, password)
         db.session.add(new_user)
         db.session.commit()
 
-        return new_user.id
+        token = Token.find_by_token_type(TokenType.VerifyEmail)
+        token_expiry = datetime.utcnow() + timedelta(hours=72)
+
+        verify_email_token = UserToken.create(new_user, token, token_expiry)
+
+        return {"userId": new_user.id, "token": verify_email_token}
 
     @classmethod
     def update_password(cls, email, password):
