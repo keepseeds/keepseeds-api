@@ -98,7 +98,7 @@ class UserToken(db.Model, Base):
         return ValidateTokenResponse(ut and ut.verify_token(token), ut)
 
     @classmethod
-    def expire_existing_tokens(cls, user_id, token_id):
+    def expire_existing_tokens(cls, user_id, token_id, except_ut_id):
         """
         Retrieve existing tokens of the specified token_type for the provided
         user and call expire() on each.
@@ -107,13 +107,15 @@ class UserToken(db.Model, Base):
         :type user_id: int
         :param token_id: Tokens of this type will be expired.
         :type token_id: int
+        :param except_ut_id: Exclude this token from the update.
+        :type except_ut_id: int
         :return: Number of tokens expired.
         :rtype: int
         """
         existing_tokens = cls.query.filter_by(user_id=user_id,
                                               token_id=token_id,
                                               delete_date_time=None
-                                              ).all()  # type: list[UserToken]
+                                              ).filter(UserToken.id != except_ut_id).all()  # type: list[UserToken]
 
         remove_count = 0
         for token in existing_tokens:
@@ -138,9 +140,10 @@ class UserToken(db.Model, Base):
         new_user_token = cls(user, token, expires_date_time)
         token_value = new_user_token.generate_encrypt_token()
 
-        cls.expire_existing_tokens(user.id, token.id)
-
         db.session.add(new_user_token)
         db.session.commit()
+
+        cls.expire_existing_tokens(user.id, token.id, new_user_token.id)
+
 
         return token_value
