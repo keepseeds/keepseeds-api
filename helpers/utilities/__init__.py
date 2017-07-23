@@ -1,1 +1,1 @@
-from validate_token_response import ValidateTokenResponse
+from .validate_token_response import ValidateTokenResponse
