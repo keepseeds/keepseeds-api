@@ -4,23 +4,23 @@ with the database via SQLAlchemy.
 """
 from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
+from webargs.flaskparser import use_args
 
+from args import post_register_args
 from models import User
 from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
-from helpers.reqparsers import rp_post_register
+
 
 class Register(Resource):
     """
     Represents a Registration resource in the API.
     """
-    parser = rp_post_register()
 
-    def post(self):
+    @use_args(post_register_args)
+    def post(self, args):
         """
         Registration request.
         """
-        args = self.parser.parse_args()
-
         email = args['email']
         first = args['firstName']
         last = args['lastName']

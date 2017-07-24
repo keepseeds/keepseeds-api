@@ -1,18 +1,18 @@
 
 from flask_restful import Resource
+from webargs.flaskparser import use_args
+
+from args import post_oauth_args
 from models import User
 from security import get_access_token
 from helpers.errors import InvalidCredentialsError
-from helpers.reqparsers import rp_post_oauth
 
 class OAuth(Resource):
     """
     Resource for OAuth authentication.
     """
-    parser = rp_post_oauth()
-
-    def post(self):
-        args = self.parser.parse_args()
+    @use_args(post_oauth_args)
+    def post(self, args):
         grant_type = args['grantType']
         token = args['token']
 

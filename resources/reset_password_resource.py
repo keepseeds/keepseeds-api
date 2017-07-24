@@ -1,11 +1,12 @@
 
 from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
+from webargs.flaskparser import use_args
 
+from args import put_reset_password_args, post_reset_password_args
 from models import User, Token, UserToken
 from models.enums import TokenType
 from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
-from helpers.reqparsers import rp_put_reset_password, rp_post_reset_password
 
 
 class ResetPassword(Resource):
@@ -18,11 +19,8 @@ class ResetPassword(Resource):
     2. User retrieves the token from their email and submits it to the POST
        endpoint along with their username, new password and matching confirmation.
     """
-    put_parser = rp_put_reset_password()
-    post_parser = rp_post_reset_password()
-
-    def post(self):
-        args = self.post_parser.parse_args()
+    @use_args(post_reset_password_args)
+    def post(self, args):
         email = args['email']
         password = args['password']
         password_confirm = args['passwordConfirm']
@@ -49,9 +47,8 @@ class ResetPassword(Resource):
 
         return 500
 
-    def put(self):
-        args = self.put_parser.parse_args()
-
+    @use_args(put_reset_password_args)
+    def put(self, args):
         user = User.find_by_email(args['email'])
 
         if not user:
