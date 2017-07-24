@@ -8,7 +8,14 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from resources import AccountAuth, OAuth, Register, ChangePassword, ResetPassword, VerifyEmail
+from resources import (
+    AccountAuth,
+    OAuth,
+    Register,
+    ChangePassword,
+    ResetPassword,
+    VerifyEmail
+)
 
 # Constants
 DB_KEY = 'DATABASE_URL'
