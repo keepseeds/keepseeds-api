@@ -1,30 +1,15 @@
 
 from flask_restful import Resource
-from models.model import User
+from models import User
 from security import get_access_token
-from helpers.reqparsers import account_authentication, oauth_authentication
+from helpers.errors import InvalidCredentialsError
+from helpers.reqparsers import rp_post_oauth
 
-class AccountAuthentication(Resource):
-    """
-    Resource for account authentication.
-    """
-    parser = account_authentication.post_request_parser()
-
-    def post(self):
-        args = self.parser.parse_args()
-
-        user = User.find_by_email(args['email'])
-
-        if user and user.verify_password(args['password']):
-            return get_access_token(user.id)
-
-        return {'message': 'Unable to validate user.'}
-
-class OAuthAuthentication(Resource):
+class OAuth(Resource):
     """
     Resource for OAuth authentication.
     """
-    parser = oauth_authentication.post_request_parser()
+    parser = rp_post_oauth()
 
     def post(self):
         args = self.parser.parse_args()
@@ -32,7 +17,7 @@ class OAuthAuthentication(Resource):
         token = args['token']
 
         if not grant_type in ('facebook',):
-            return {'message': 'Grant Type not supported.'}
+            raise InvalidCredentialsError
 
         # 1. Ensure we support grantType provided
         # 2. Look up user based on token via 3rd party, ensure the access token
@@ -43,4 +28,4 @@ class OAuthAuthentication(Resource):
         #    local user id.
 
         # Handle req parse
-        return {'message': 'Not yet implemented.'}
+        raise NotImplementedError

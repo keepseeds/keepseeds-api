@@ -5,14 +5,15 @@ with the database via SQLAlchemy.
 from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
 
-from models.model import User
-from helpers.reqparsers.register import post_request_parser
+from models import User
+from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
+from helpers.reqparsers import rp_post_register
 
 class Register(Resource):
     """
     Represents a Registration resource in the API.
     """
-    parser = post_request_parser()
+    parser = rp_post_register()
 
     def post(self):
         """
@@ -27,11 +28,11 @@ class Register(Resource):
         password_confirm = args['passwordConfirm']
 
         if User.find_by_email(email):
-            return {'message': 'Unable to create user.'}
+            raise UnableToCompleteError
 
         if not safe_str_cmp(password, password_confirm):
-            return {'message': 'Passwords do not match.'}
+            raise PasswordsDoNotMatchError
 
-        user_id = User.create(email, first, last, password)
+        create_user_result = User.create(email, first, last, password)
 
-        return {'message': 'Created successfully, please log in.', "id": user_id}, 201
+        return create_user_result, 201

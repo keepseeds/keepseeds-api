@@ -3,12 +3,19 @@ Main entry point for the application, this is
 accessed as '__main__' when developing locally.
 """
 import os
+from helpers.errors import resource_errors
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from resources.authentication_resource import AccountAuthentication, OAuthAuthentication
-from resources.register_resource import Register
+from resources import (
+    AccountAuth,
+    OAuth,
+    Register,
+    ChangePassword,
+    ResetPassword,
+    VerifyEmail
+)
 
 # Constants
 DB_KEY = 'DATABASE_URL'
@@ -19,13 +26,16 @@ app.secret_key = os.environ.get('APP_SECRET', 'TEST_SECRET')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(DB_KEY, DB_LOCAL_PATH)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-api = Api(app)
+api = Api(app, errors=resource_errors)
 
 JWTManager(app)
 
-api.add_resource(AccountAuthentication, '/auth')
-api.add_resource(OAuthAuthentication, '/oauth')
+api.add_resource(AccountAuth, '/auth')
+api.add_resource(OAuth, '/oauth')
 api.add_resource(Register, '/register')
+api.add_resource(ChangePassword, '/change-password')
+api.add_resource(ResetPassword, '/reset-password')
+api.add_resource(VerifyEmail, '/verify-email')
 
 if __name__ == '__main__':
     from db import db
