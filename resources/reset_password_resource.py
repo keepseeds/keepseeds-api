@@ -1,12 +1,12 @@
 
 from flask_restful import Resource
-from werkzeug.security import safe_str_cmp
 from webargs.flaskparser import use_args
 
-from args import put_reset_password_args, post_reset_password_args
+from helpers import validate_password
 from models import User, Token, UserToken
 from models.enums import TokenType
-from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
+from helpers.errors import UnableToCompleteError
+from .args import put_reset_password_args, post_reset_password_args
 
 
 class ResetPassword(Resource):
@@ -38,14 +38,13 @@ class ResetPassword(Resource):
         if not vr.is_valid:
             raise UnableToCompleteError
 
-        if not safe_str_cmp(password, password_confirm):
-            raise PasswordsDoNotMatchError
+        validate_password(password, password_confirm)
 
         if User.update_password(email, password):
             vr.user_token.expire()
             return {'message': 'Done.'}, 204
 
-        return 500
+        raise UnableToCompleteError
 
     @use_args(put_reset_password_args)
     def put(self, args):

@@ -1,3 +1,6 @@
+"""
+Webarg definitions for register_resource.
+"""
 from marshmallow.fields import Str
 
 post_register_args = {

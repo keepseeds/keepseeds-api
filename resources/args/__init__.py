@@ -1,3 +1,6 @@
+"""
+Module containing all resource endpoint webargs definitions.
+"""
 from .account_auth import post_account_auth_args
 from .change_password import put_change_password_args
 from .oauth import post_oauth_args

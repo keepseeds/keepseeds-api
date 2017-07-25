@@ -7,10 +7,10 @@ from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import jwt_required
 from webargs.flaskparser import use_args
 
-from args import put_change_password_args
+from helpers import validate_password
+from helpers.errors import UnableToCompleteError
 from models import User
-from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
-from responses import DoneResponse
+from .args import put_change_password_args
 
 
 class ChangePassword(Resource):
@@ -30,10 +30,9 @@ class ChangePassword(Resource):
         if not user or not user.verify_password(old_password):
             raise UnableToCompleteError
 
-        if not safe_str_cmp(password, password_confirm):
-            raise PasswordsDoNotMatchError
+        validate_password(password, password_confirm)
 
         if User.update_password(email, password):
-            return DoneResponse().json(), 204
+            return {'message': 'Done.'}, 204
 
         raise UnableToCompleteError

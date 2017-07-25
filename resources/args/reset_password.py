@@ -1,3 +1,6 @@
+"""
+Webarg definitions for reset_password_resource.
+"""
 from marshmallow.fields import Str
 
 put_reset_password_args = {

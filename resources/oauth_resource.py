@@ -2,10 +2,10 @@
 from flask_restful import Resource
 from webargs.flaskparser import use_args
 
-from args import post_oauth_args
 from models import User
 from security import get_access_token
 from helpers.errors import InvalidCredentialsError
+from .args import post_oauth_args
 
 class OAuth(Resource):
     """

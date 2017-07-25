@@ -2,11 +2,10 @@
 from flask_restful import Resource
 from webargs.flaskparser import use_args
 
-from args import post_verify_email_args
 from models.enums import TokenType
 from models import User, UserToken
 from helpers.errors import UnableToCompleteError
-from responses import DoneResponse
+from .args import post_verify_email_args
 
 
 class VerifyEmail(Resource):
@@ -29,4 +28,4 @@ class VerifyEmail(Resource):
         if user.set_is_verified_email():
             vr.user_token.expire()
 
-        return DoneResponse().json(), 204
+        return {'message': 'Done'}, 204

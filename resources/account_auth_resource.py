@@ -7,8 +7,8 @@ from webargs.flaskparser import use_args
 
 from models import User
 from security import get_access_token
-from args import post_account_auth_args
 from helpers.errors import InvalidCredentialsError
+from .args import post_account_auth_args
 
 
 class AccountAuth(Resource):

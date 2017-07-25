@@ -6,9 +6,10 @@ from flask_restful import Resource
 from werkzeug.security import safe_str_cmp
 from webargs.flaskparser import use_args
 
-from args import post_register_args
+from helpers import validate_password
 from models import User
-from helpers.errors import UnableToCompleteError, PasswordsDoNotMatchError
+from helpers.errors import UnableToCompleteError
+from .args import post_register_args
 
 
 class Register(Resource):
@@ -30,8 +31,7 @@ class Register(Resource):
         if User.find_by_email(email):
             raise UnableToCompleteError
 
-        if not safe_str_cmp(password, password_confirm):
-            raise PasswordsDoNotMatchError
+        validate_password(password, password_confirm)
 
         create_user_result = User.create(email, first, last, password)
 

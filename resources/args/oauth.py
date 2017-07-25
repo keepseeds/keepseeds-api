@@ -1,4 +1,6 @@
-
+"""
+Webarg definitions for oauth_resource.
+"""
 from marshmallow.fields import Str
 
 post_oauth_args = {
