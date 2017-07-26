@@ -3,7 +3,8 @@ Main entry point for the application, this is
 accessed as '__main__' when developing locally.
 """
 import os
-from helpers.errors import resource_errors
+
+from helpers import resource_errors
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager

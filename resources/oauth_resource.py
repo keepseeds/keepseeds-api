@@ -4,7 +4,8 @@ from webargs.flaskparser import use_args
 
 from models import User
 from security import get_access_token
-from helpers.errors import InvalidCredentialsError
+from helpers import InvalidCredentialsError
+
 from .args import post_oauth_args
 
 class OAuth(Resource):

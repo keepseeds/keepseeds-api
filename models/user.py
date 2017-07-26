@@ -6,11 +6,10 @@ from datetime import datetime, timedelta
 from db import db
 from passlib.hash import pbkdf2_sha256
 
+from .token import Token
+from .user_token import UserToken
 from .mixins import Base
 from .enums import TokenType
-from .user_token import UserToken
-from .token import Token
-
 
 class User(db.Model, Base):
     """

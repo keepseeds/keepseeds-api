@@ -2,10 +2,10 @@
 from flask_restful import Resource
 from webargs.flaskparser import use_args
 
-from helpers import validate_password
+from helpers import validate_password, UnableToCompleteError
 from models import User, Token, UserToken
 from models.enums import TokenType
-from helpers.errors import UnableToCompleteError
+
 from .args import put_reset_password_args, post_reset_password_args
 
 

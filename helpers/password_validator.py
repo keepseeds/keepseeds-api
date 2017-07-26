@@ -1,7 +1,8 @@
 
 import re
 from werkzeug.security import safe_str_cmp
-from helpers.errors import UnmetPasswordRequirementsError
+
+from .resource_exceptions import UnmetPasswordRequirementsError
 
 def validate_password(password, password_confirm):
     """

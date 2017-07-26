@@ -4,10 +4,12 @@ import shortuuid
 from db import db
 from passlib.hash import pbkdf2_sha256
 from datetime import datetime, timedelta
-from .token import Token
-from helpers.utilities import ValidateTokenResponse
+from helpers import ValidateTokenResponse
+
 from .enums import TokenType
 from .mixins import Base
+from .token import Token
+
 
 
 class UserToken(db.Model, Base):
