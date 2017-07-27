@@ -2,10 +2,7 @@
 from flask_restful import Resource
 from webargs.flaskparser import use_args
 
-from helpers import validate_password, UnableToCompleteError
-from models import User, Token, UserToken
-from models.enums import TokenType
-
+from services import AccountService
 from .args import put_reset_password_args, post_reset_password_args
 
 
@@ -19,6 +16,9 @@ class ResetPassword(Resource):
     2. User retrieves the token from their email and submits it to the POST
        endpoint along with their username, new password and matching confirmation.
     """
+
+    account_service = AccountService()
+
     @use_args(post_reset_password_args)
     def post(self, args):
         email = args['email']
@@ -26,40 +26,22 @@ class ResetPassword(Resource):
         password_confirm = args['passwordConfirm']
         token = args['token']
 
-        user = User.find_by_email(email)
+        result = self.account_service.resolve_password_reset(
+            email,
+            password,
+            password_confirm,
+            token
+        )
 
-        if not user:
-            raise UnableToCompleteError
+        return result, 204
 
-        vr = UserToken.validate_token(user_id=user.id,
-                                      token=token,
-                                      token_type=TokenType.ResetPassword)
-
-        if not vr.is_valid:
-            raise UnableToCompleteError
-
-        validate_password(password, password_confirm)
-
-        if User.update_password(email, password):
-            vr.user_token.expire()
-            return {'message': 'Done.'}, 204
-
-        raise UnableToCompleteError
 
     @use_args(put_reset_password_args)
     def put(self, args):
-        user = User.find_by_email(args['email'])
+        email = args['email']
 
-        if not user:
-            raise UnableToCompleteError
-
-        token = Token.find_by_token_type(TokenType.ResetPassword)
-
-        if not token:
-            raise UnableToCompleteError
-
-        new_user_token_id = UserToken.create(user, token)
+        result = self.account_service.request_password_reset(email)
 
         # This currently returns the plain token but it will need to
-        # send it to the email provided.
-        return {'userTokenId': new_user_token_id}, 202
+        # send it as an email to the user.
+        return result, 202

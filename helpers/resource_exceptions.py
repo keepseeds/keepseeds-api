@@ -67,6 +67,15 @@ class InvalidCredentialsError(HTTPException):
     """
     code = 401
 
+class EmailNotVerifiedError(ResourceError):
+    """
+    Provided email is not verified.
+    """
+    code = 401
+
+    def __init__(self, email):
+        ResourceError.__init__(self, {'email': email})
+
 #
 # Dictionary of Exception Types
 #
@@ -103,9 +112,14 @@ resource_errors = {
         'status': 400
     },
     'InvalidTokenError': {
-        'error_code': 'INVALID_TOKEN_ERROR',
+        'error_code': 'INVALID_TOKEN',
         'message': 'Could not find the provided token.',
         'status': 400
+    },
+    'EmailNotVerifiedError': {
+        'error_code': 'EMAIL_NOT_VERIFIED',
+        'message': 'The provided email is not verified.',
+        'status': 401
     }
 }
 
@@ -117,5 +131,6 @@ __all__ = [
     'UserNotFoundError',
     'EmailAlreadyExistsError',
     'InvalidTokenError',
+    'EmailNotVerifiedError',
     'resource_errors'
 ]
