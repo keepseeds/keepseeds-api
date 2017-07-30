@@ -4,7 +4,6 @@ import shortuuid
 from db import db
 from passlib.hash import pbkdf2_sha256
 from datetime import datetime, timedelta
-from helpers import ValidateTokenResponse
 
 from .enums import TokenType
 from .mixins import Base
@@ -99,10 +98,6 @@ class UserToken(db.Model, Base):
         ).first()  # type: UserToken
 
         return user_token
-
-    @classmethod
-    def validate_token(cls, user_id, token, token_type):
-        return ValidateTokenResponse(ut and ut.verify_token(token), ut)
 
     @classmethod
     def expire_existing_tokens(cls, user_id, token_id, except_ut_id):

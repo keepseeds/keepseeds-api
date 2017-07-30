@@ -6,6 +6,7 @@ from db import db
 
 from .mixins import Base
 
+
 class Grant(db.Model, Base):
     """
     Database representation of a Grant.
@@ -15,5 +16,6 @@ class Grant(db.Model, Base):
     __tablename__ = 'grants'
 
     name = db.Column(db.String(100), nullable=False)
+    is_enabled = db.Column(db.Boolean, nullable=False)
 
     users = db.relationship('UserGrant', back_populates='grant')

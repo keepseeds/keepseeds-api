@@ -227,6 +227,12 @@ class AccountService(object):
         """
         Validate the provided password, optional password_confirm to
         ensure password is entered correctly twice.
+
+        :param password: Password to validate
+        :type password: str
+        :param password_confirm: Optional password confirmation
+        :type password_confirm: str
+        :rtype: bool
         """
         re_symbol = r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]'
 
