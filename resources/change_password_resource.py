@@ -22,13 +22,11 @@ class ChangePassword(Resource):
     @jwt_required
     @use_args(put_change_password_args)
     def put(self, args):
-        email = args['email']
         old_password = args['oldPassword']
         password = args['password']
         password_confirm = args['passwordConfirm']
 
         AccountService.change_password(
-            email,
             old_password,
             password,
             password_confirm

@@ -1,17 +1,20 @@
 """Module containing the AccountService definition."""
-from flask_jwt_extended import create_access_token
+
+import re
+from werkzeug.security import safe_str_cmp
+from flask_jwt_extended import create_access_token, get_jwt_identity
 
 from models import User, Token, UserToken
 from models.enums import TokenType
-from helpers import resource_exceptions as res_exc, validate_password
+from helpers import resource_exceptions as res_exc
 
 
 class AccountService(object):
     """
     Service for account actions.
     """
-    @staticmethod
-    def register_user(email, first, last, password, password_confirm):
+    @classmethod
+    def register_user(cls, email, first, last, password, password_confirm):
         """
         Register a new user.
 
@@ -31,7 +34,7 @@ class AccountService(object):
         if User.find_by_email(email):
             raise res_exc.EmailAlreadyExistsError(email)
 
-        validate_password(password, password_confirm)
+        cls.__validate_password(password, password_confirm)
 
         create_user_result = User.create(email, first, last, password)
 
@@ -64,15 +67,15 @@ class AccountService(object):
             raise res_exc.InvalidTokenError(token)
 
         # Update user to set is_verified_email=True
-        if not user.set_is_verified_email(email):
+        if not user.set_is_verified_email():
             raise res_exc.UnableToCompleteError
 
         # Expire this user token and return True.
         user_token.expire()
         return True
 
-    @staticmethod
-    def change_password(email, old_password, password, password_confirm):
+    @classmethod
+    def change_password(cls, old_password, password, password_confirm):
         """
         Change the password for a user.
 
@@ -87,7 +90,7 @@ class AccountService(object):
         :rtype: bool
         """
 
-        user = User.find_by_email(email)
+        user = User.find_by_id(get_jwt_identity())
 
         if not user:
             raise res_exc.UserNotFoundError
@@ -95,9 +98,9 @@ class AccountService(object):
         if not user.verify_password(old_password):
             raise res_exc.UnableToCompleteError
 
-        validate_password(password, password_confirm)
+        cls.__validate_password(password, password_confirm)
 
-        if not User.update_password(email, password):
+        if not user.update_password(password):
             raise res_exc.UnableToCompleteError
 
         return True
@@ -128,8 +131,8 @@ class AccountService(object):
 
         return {'userTokenId': new_user_token_id}
 
-    @staticmethod
-    def resolve_password_reset(email, password, password_confirm, token):
+    @classmethod
+    def resolve_password_reset(cls, email, password, password_confirm, token):
         """
         Resolve a password reset for a user.
 
@@ -155,9 +158,9 @@ class AccountService(object):
         if not user_token or not user_token.verify_token(token):
             raise res_exc.InvalidTokenError(token)
 
-        validate_password(password, password_confirm)
+        cls.__validate_password(password, password_confirm)
 
-        if not User.update_password(email, password):
+        if not user.update_password(password):
             raise res_exc.UnableToCompleteError
 
         user_token.expire()
@@ -218,3 +221,43 @@ class AccountService(object):
         :rtype: dict
         """
         return {'accessToken': create_access_token(identity=identifier)}
+
+    @classmethod
+    def __validate_password(cls, password, password_confirm=None):
+        """
+        Validate the provided password, optional password_confirm to
+        ensure password is entered correctly twice.
+        """
+        re_symbol = r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]'
+
+        length_error = len(password) < 8
+        digit_error = re.search(r"\d", password) is None
+        uppercase_error = re.search(r"[A-Z]", password) is None
+        lowercase_error = re.search(r"[a-z]", password) is None
+        symbol_error = re.search(re_symbol, password) is None
+        comparison_error = (
+            password_confirm
+            and not safe_str_cmp(password, password_confirm)
+        )
+
+        is_password_valid = not (
+            length_error or
+            digit_error or
+            uppercase_error or
+            lowercase_error or
+            symbol_error or
+            comparison_error
+        )
+
+        if not is_password_valid:
+            data = {
+                'length_error': length_error,
+                'digit_error': digit_error,
+                'uppercase_error': uppercase_error,
+                'lower_error': lowercase_error,
+                'symbol_error': symbol_error,
+                'comparison_error': comparison_error
+            }
+            raise res_exc.UnmetPasswordRequirementsError(data)
+
+        return True
