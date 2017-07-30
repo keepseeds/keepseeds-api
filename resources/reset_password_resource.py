@@ -17,8 +17,6 @@ class ResetPassword(Resource):
        endpoint along with their username, new password and matching confirmation.
     """
 
-    account_service = AccountService()
-
     @use_args(post_reset_password_args)
     def post(self, args):
         email = args['email']
@@ -26,21 +24,21 @@ class ResetPassword(Resource):
         password_confirm = args['passwordConfirm']
         token = args['token']
 
-        result = self.account_service.resolve_password_reset(
+        AccountService.resolve_password_reset(
             email,
             password,
             password_confirm,
             token
         )
 
-        return result, 204
+        return None, 204
 
 
     @use_args(put_reset_password_args)
     def put(self, args):
         email = args['email']
 
-        result = self.account_service.request_password_reset(email)
+        result = AccountService.request_password_reset(email)
 
         # This currently returns the plain token but it will need to
         # send it as an email to the user.

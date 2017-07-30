@@ -10,16 +10,19 @@ from flask_restful import HTTPException
 # Custom Exception Types
 #
 
+
 class ResourceError(HTTPException):
     def __init__(self, data={}):
         HTTPException.__init__(self)
         self.data = {'error_data': data}
+
 
 class UnableToCompleteError(HTTPException):
     """
     Generic error message, no specific detail provided.
     """
     code = 400
+
 
 class EmailAlreadyExistsError(ResourceError):
     """
@@ -30,27 +33,33 @@ class EmailAlreadyExistsError(ResourceError):
     def __init__(self, email):
         ResourceError.__init__(self, {'email': email})
 
+
 class UserNotFoundError(ResourceError):
     """
     Error thrown when the user could not be found.
     """
     code = 400
+
     def __init__(self):
         ResourceError.__init__(self)
+
 
 class InvalidTokenError(ResourceError):
     """
     Error thrown when the provided token was not found.
     """
     code = 400
+
     def __init__(self, token):
         ResourceError.__init__(self, {'token': token})
+
 
 class PasswordsDoNotMatchError(HTTPException):
     """
     Password comparison has failed.
     """
     code = 400
+
 
 class UnmetPasswordRequirementsError(ResourceError):
     """
@@ -61,11 +70,13 @@ class UnmetPasswordRequirementsError(ResourceError):
     def __init__(self, data):
         ResourceError.__init__(self, data)
 
+
 class InvalidCredentialsError(HTTPException):
     """
     Provided credentials are not valid.
     """
     code = 401
+
 
 class EmailNotVerifiedError(ResourceError):
     """

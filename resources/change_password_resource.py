@@ -19,8 +19,6 @@ class ChangePassword(Resource):
     Represents a ChangePassword resource in the API.
     """
 
-    account_service = AccountService()
-
     @jwt_required
     @use_args(put_change_password_args)
     def put(self, args):
@@ -29,7 +27,7 @@ class ChangePassword(Resource):
         password = args['password']
         password_confirm = args['passwordConfirm']
 
-        self.account_service.change_password(
+        AccountService.change_password(
             email,
             old_password,
             password,

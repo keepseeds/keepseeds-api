@@ -12,13 +12,11 @@ from .args import post_verify_email_args
 
 class VerifyEmail(Resource):
 
-    account_service = AccountService()
-
     @use_args(post_verify_email_args)
     def post(self, args):
         email = args['email']
         token = args['token']
 
-        self.account_service.verify_email(email, token)
+        AccountService.verify_email(email, token)
 
         return {'message': 'Done'}, 204

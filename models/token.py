@@ -15,6 +15,9 @@ class Token(db.Model, Base):
     name = db.Column(db.String(100), nullable=False)
     users = db.relationship('UserToken', back_populates='token')
 
+    def __init__(self, name):
+        self.name = name
+
     @classmethod
     def find_by_token_type(cls, token_type):
         """

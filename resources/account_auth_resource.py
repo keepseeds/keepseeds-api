@@ -13,7 +13,6 @@ class AccountAuth(Resource):
     """
     Resource for account authentication.
     """
-    account_service = AccountService()
 
     @use_args(post_account_auth_args)
     def post(self, args):
@@ -23,7 +22,7 @@ class AccountAuth(Resource):
         email = args['email']
         password = args['password']
 
-        result = self.account_service.authenticate_user(email, password)
+        result = AccountService.authenticate_user(email, password)
 
         return result, 200
         

@@ -13,7 +13,6 @@ class Register(Resource):
     """
     Represents a Registration resource in the API.
     """
-    account_service = AccountService()
 
     @use_args(post_register_args)
     def post(self, args):
@@ -26,7 +25,7 @@ class Register(Resource):
         password = args['password']
         password_confirm = args['passwordConfirm']
 
-        create_user_result = self.account_service.register_user(
+        create_user_result = AccountService.register_user(
             email,
             first,
             last,

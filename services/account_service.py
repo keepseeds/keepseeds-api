@@ -10,7 +10,8 @@ class AccountService(object):
     """
     Service for account actions.
     """
-    def register_user(self, email, first, last, password, password_confirm):
+    @staticmethod
+    def register_user(email, first, last, password, password_confirm):
         """
         Register a new user.
 
@@ -36,7 +37,8 @@ class AccountService(object):
 
         return create_user_result
 
-    def verify_email(self, email, token):
+    @staticmethod
+    def verify_email(email, token):
         """
         Verify an email address for a user.
 
@@ -47,22 +49,30 @@ class AccountService(object):
         :rtype: bool
         """
 
+        # Lookup user via email.
         user = User.find_by_email(email)
 
         if not user:
             raise res_exc.UserNotFoundError
 
-        vtr = UserToken.validate_token(user.id, token, TokenType.VerifyEmail)
+        # Lookup user token with the id of the user and token type.
+        user_token = UserToken.find_by_user_and_type(
+            user_id=user.id,
+            token_type=TokenType.VerifyEmail)
 
-        if not vtr.is_valid:
+        if not user_token or not user_token.verify_token(token):
             raise res_exc.InvalidTokenError(token)
 
-        if user.set_is_verified_email(email):
-            vtr.user_token.expire()
+        # Update user to set is_verified_email=True
+        if not user.set_is_verified_email(email):
+            raise res_exc.UnableToCompleteError
 
+        # Expire this user token and return True.
+        user_token.expire()
         return True
 
-    def change_password(self, email, old_password, password, password_confirm):
+    @staticmethod
+    def change_password(email, old_password, password, password_confirm):
         """
         Change the password for a user.
 
@@ -92,7 +102,8 @@ class AccountService(object):
 
         return True
 
-    def request_password_reset(self, email):
+    @staticmethod
+    def request_password_reset(email):
         """
         Request a password reset for a user.
 
@@ -112,9 +123,13 @@ class AccountService(object):
 
         new_user_token_id = UserToken.create(user, token)
 
+        if not new_user_token_id:
+            raise res_exc.UnableToCompleteError
+
         return {'userTokenId': new_user_token_id}
 
-    def resolve_password_reset(self, email, password, password_confirm, token):
+    @staticmethod
+    def resolve_password_reset(email, password, password_confirm, token):
         """
         Resolve a password reset for a user.
 
@@ -133,22 +148,23 @@ class AccountService(object):
         if not user:
             raise res_exc.UserNotFoundError
 
-        vr = UserToken.validate_token(user_id=user.id,
-                                      token=token,
-                                      token_type=TokenType.ResetPassword)
+        user_token = UserToken.find_by_user_and_type(
+            user_id=user.id,
+            token_type=TokenType.ResetPassword)
 
-        if not vr.is_valid:
-            raise res_exc.InvalidTokenError
+        if not user_token or not user_token.verify_token(token):
+            raise res_exc.InvalidTokenError(token)
 
         validate_password(password, password_confirm)
 
-        if User.update_password(email, password):
-            vr.user_token.expire()
-            return {'message': 'Done.'}
+        if not User.update_password(email, password):
+            raise res_exc.UnableToCompleteError
 
-        raise res_exc.UnableToCompleteError
+        user_token.expire()
+        return True
 
-    def authenticate_user(self, email, password):
+    @classmethod
+    def authenticate_user(cls, email, password):
         """
         Authenticate a user.
 
@@ -166,9 +182,10 @@ class AccountService(object):
         if not user.is_verified_email:
             raise res_exc.EmailNotVerifiedError
 
-        return self.__get_access_token(user.id)
+        return cls.__get_access_token(user.id)
 
-    def oauth_authentication(self, grant_type, token):
+    @staticmethod
+    def oauth_authentication(grant_type, token):
         """
         Authenticate a user via OAuth.
 
@@ -191,7 +208,8 @@ class AccountService(object):
 
         raise NotImplementedError
 
-    def __get_access_token(self, identifier):
+    @classmethod
+    def __get_access_token(cls, identifier):
         """
         [PRIVATE] Generate and return an access token using the
         provided identifier.
