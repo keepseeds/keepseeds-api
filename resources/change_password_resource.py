@@ -3,14 +3,10 @@ Module for the ChangePassword class, this class interacts
 with the database via SQLAlchemy.
 """
 from flask_restful import Resource
-from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import jwt_required
 from webargs.flaskparser import use_args
 
-from helpers import validate_password, UnableToCompleteError
-from models import User
 from services import AccountService
-
 from .args import put_change_password_args
 
 
