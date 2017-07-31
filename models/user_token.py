@@ -4,10 +4,11 @@ import shortuuid
 from db import db
 from passlib.hash import pbkdf2_sha256
 from datetime import datetime, timedelta
-from .token import Token
-from helpers.utilities import ValidateTokenResponse
+
 from .enums import TokenType
 from .mixins import Base
+from .token import Token
+
 
 
 class UserToken(db.Model, Base):
@@ -77,25 +78,26 @@ class UserToken(db.Model, Base):
     #
 
     @classmethod
-    def validate_token(cls, user_id, token, token_type):
+    def find_by_user_and_type(cls, user_id, token_type):
         """
         Look up user tokens for this user of the specific token_type
         and validate the provided token against it.
 
         :param user_id:
         :type user_id: int
-        :param token:
-        :type token: str
         :param token_type:
         :type token_type: TokenType
-        :return:
-        :rtype: ValidateTokenResponse
+        :rtype: UserToken
         """
-        ut = cls.query.filter_by(user_id=user_id,
-                                 delete_date_time=None,
-                                 token_id=int(token_type)).filter(UserToken.expires_date_time > datetime.utcnow()).first()  # type: UserToken
+        user_token = cls.query.filter_by(
+            user_id=user_id,
+            delete_date_time=None,
+            token_id=int(token_type)
+        ).filter(
+            cls.expires_date_time > datetime.utcnow()
+        ).first()  # type: UserToken
 
-        return ValidateTokenResponse(ut and ut.verify_token(token), ut)
+        return user_token
 
     @classmethod
     def expire_existing_tokens(cls, user_id, token_id, except_ut_id):
@@ -138,12 +140,14 @@ class UserToken(db.Model, Base):
         :rtype: str
         """
         new_user_token = cls(user, token, expires_date_time)
-        token_value = new_user_token.generate_encrypt_token()
 
-        db.session.add(new_user_token)
-        db.session.commit()
+        token_value = None
+        try:
+            token_value = new_user_token.generate_encrypt_token()
 
-        cls.expire_existing_tokens(user.id, token.id, new_user_token.id)
+            db.session.add(new_user_token)
+            db.session.commit()
 
-
-        return token_value
+            cls.expire_existing_tokens(user.id, token.id, new_user_token.id)
+        finally:
+            return token_value

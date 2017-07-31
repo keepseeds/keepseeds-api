@@ -5,9 +5,7 @@ and password.
 from flask_restful import Resource
 from webargs.flaskparser import use_args
 
-from models import User
-from security import get_access_token
-from helpers.errors import InvalidCredentialsError
+from services import AccountService
 from .args import post_account_auth_args
 
 
@@ -21,9 +19,10 @@ class AccountAuth(Resource):
         """
         Authenticate the provided email and password against the database.
         """
-        user = User.find_by_email(args['email'])
+        email = args['email']
+        password = args['password']
 
-        if user and user.verify_password(args['password']) and user.is_verified_email:
-            return get_access_token(user.id), 200
+        result = AccountService.authenticate_user(email, password)
 
-        raise InvalidCredentialsError
+        return result, 200
+        

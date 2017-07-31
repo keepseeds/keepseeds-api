@@ -1,20 +1,26 @@
 
 import re
 from werkzeug.security import safe_str_cmp
-from helpers.errors import UnmetPasswordRequirementsError
+from helpers import resource_exceptions as res_exc
 
-def validate_password(password, password_confirm):
+def validate_password(password, password_confirm=None):
     """
     Validate the provided password, optional password_confirm to
     ensure password is entered correctly twice.
+
+    :param password: Password to validate
+    :type password: str
+    :param password_confirm: Optional password confirmation
+    :type password_confirm: str
+    :rtype: bool
     """
-    RE_SYMBOL = r"[ !#$%&'()*+,-./[\\\]^_`{|}~"+r'"]'
+    re_symbol = r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]'
 
     length_error = len(password) < 8
     digit_error = re.search(r"\d", password) is None
     uppercase_error = re.search(r"[A-Z]", password) is None
     lowercase_error = re.search(r"[a-z]", password) is None
-    symbol_error = re.search(RE_SYMBOL, password) is None
+    symbol_error = re.search(re_symbol, password) is None
     comparison_error = (
         password_confirm
         and not safe_str_cmp(password, password_confirm)
@@ -34,10 +40,10 @@ def validate_password(password, password_confirm):
             'length_error': length_error,
             'digit_error': digit_error,
             'uppercase_error': uppercase_error,
-            'lower_error': lowercase_error,
+            'lowercase_error': lowercase_error,
             'symbol_error': symbol_error,
             'comparison_error': comparison_error
         }
-        raise UnmetPasswordRequirementsError(data)
+        raise res_exc.UnmetPasswordRequirementsError(data)
 
     return True

@@ -6,11 +6,10 @@ from datetime import datetime, timedelta
 from db import db
 from passlib.hash import pbkdf2_sha256
 
+from .token import Token
+from .user_token import UserToken
 from .mixins import Base
 from .enums import TokenType
-from .user_token import UserToken
-from .token import Token
-
 
 class User(db.Model, Base):
     """
@@ -81,6 +80,11 @@ class User(db.Model, Base):
         """
         self.is_locked = is_locked
         db.session.commit()
+
+    def update_password(self, password):
+        self.encrypt_password(password)
+        db.session.commit()
+        return True
 
     def set_is_verified_email(self, is_verified_email=True):
         """
@@ -163,23 +167,3 @@ class User(db.Model, Base):
         verify_email_token = UserToken.create(new_user, token, token_expiry)
 
         return {"token": verify_email_token}
-
-    @classmethod
-    def update_password(cls, email, password):
-        """
-
-        :param email: Email address of user to update.
-        :type email: str
-        :param password: New password to set for user.
-        :type password: str
-        :rtype bool
-        """
-        user = cls.find_by_email(email)
-
-        if not user:
-            return False
-
-        user.encrypt_password(password)
-        db.session.commit()
-
-        return True

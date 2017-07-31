@@ -57,3 +57,8 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 \.idea/misc\.xml
+
+# pytest
+.cache
+
+\.coverage

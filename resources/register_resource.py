@@ -3,12 +3,9 @@ Module for the Register class, this class interacts
 with the database via SQLAlchemy.
 """
 from flask_restful import Resource
-from werkzeug.security import safe_str_cmp
 from webargs.flaskparser import use_args
 
-from helpers import validate_password
-from models import User
-from helpers.errors import UnableToCompleteError
+from services import AccountService
 from .args import post_register_args
 
 
@@ -28,11 +25,12 @@ class Register(Resource):
         password = args['password']
         password_confirm = args['passwordConfirm']
 
-        if User.find_by_email(email):
-            raise UnableToCompleteError
-
-        validate_password(password, password_confirm)
-
-        create_user_result = User.create(email, first, last, password)
+        create_user_result = AccountService.register_user(
+            email,
+            first,
+            last,
+            password,
+            password_confirm
+        )
 
         return create_user_result, 201

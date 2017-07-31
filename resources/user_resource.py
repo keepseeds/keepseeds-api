@@ -3,7 +3,6 @@ Module for the UserResource class, this class interacts
 with the database via SQLAlchemy.
 """
 from flask_restful import Resource
-from models import User
 
 
 class UserResource(Resource):
