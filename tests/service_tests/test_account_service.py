@@ -491,20 +491,60 @@ class TestAccountService(unittest.TestCase):
         user.find_by_email.assert_any_call('test@test.com')
 
     @mock.patch('services.account_service.User')
-    @mock.patch('services.account_service.create_access_token')
-    def test__authenticate_user__valid(self, create_access_token, user):
+    @mock.patch('services.account_service.get_access_token')
+    def test__authenticate_user__valid(self, get_access_token, user):
         """
         """
         # Arrange
         mock_user = mock.MagicMock()
         mock_user.verify_password.return_value = True
-        mock_user.is_verified_email.return_value = True
+        mock_user.is_verified_email = True
         mock_user.id = 1
         user.find_by_email.return_value = mock_user
-        create_access_token.return_value = 'test-token'
+        get_access_token.return_value = {'accessToken': 'test-token'}
 
         # Act
         result = AccountService.authenticate_user('test@test.com', 'Password1!')
 
         assert result['accessToken'] == 'test-token'
-        create_access_token.assert_any_call(identity=1)
+        get_access_token.assert_any_call(1)
+
+    @mock.patch('services.account_service.User')
+    def test__authenticate_user__no_user(self, user):
+        """
+        """
+        # Arrange
+        user.find_by_email.return_value = None
+
+        # Act
+        with pytest.raises(res_exc.InvalidCredentialsError):
+            AccountService.authenticate_user('test@test.com', 'Password1!')
+
+        user.find_by_email.assert_any_call('test@test.com')
+
+    @mock.patch('services.account_service.User')
+    def test__authenticate_user__not_validated(self, user):
+        """
+        """
+        # Arrange
+        mock_user = mock.MagicMock()
+        mock_user.verify_password.return_value = True
+        mock_user.is_verified_email = False
+        mock_user.id = 1
+        user.find_by_email.return_value = mock_user
+
+        # Act
+        with pytest.raises(res_exc.EmailNotVerifiedError):
+            AccountService.authenticate_user('test@test.com', 'Password1!')
+
+        user.find_by_email.assert_any_call('test@test.com')
+
+    def test__authenticate_oauth__invalid_grant(self):
+
+        with pytest.raises(res_exc.InvalidCredentialsError):
+            AccountService.authenticate_oauth('google', 'test-token')
+
+    def test__authenticate_oauth__raises_not_implemented(self):
+
+        with pytest.raises(NotImplementedError):
+            AccountService.authenticate_oauth('facebook', 'test-token')

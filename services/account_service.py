@@ -1,12 +1,11 @@
 """Module containing the AccountService definition."""
 
-import re
-from werkzeug.security import safe_str_cmp
-from flask_jwt_extended import create_access_token, get_jwt_identity
+from flask_jwt_extended import get_jwt_identity
 
 from models import User, Token, UserToken
 from models.enums import TokenType
 from helpers import resource_exceptions as res_exc
+from .utils import get_access_token, validate_password
 
 
 class AccountService(object):
@@ -34,7 +33,7 @@ class AccountService(object):
         if User.find_by_email(email):
             raise res_exc.EmailAlreadyExistsError(email)
 
-        cls.__validate_password(password, password_confirm)
+        validate_password(password, password_confirm)
 
         create_user_result = User.create(email, first, last, password)
 
@@ -98,7 +97,7 @@ class AccountService(object):
         if not user.verify_password(old_password):
             raise res_exc.UnableToCompleteError
 
-        cls.__validate_password(password, password_confirm)
+        validate_password(password, password_confirm)
 
         if not user.update_password(password):
             raise res_exc.UnableToCompleteError
@@ -158,7 +157,7 @@ class AccountService(object):
         if not user_token or not user_token.verify_token(token):
             raise res_exc.InvalidTokenError(token)
 
-        cls.__validate_password(password, password_confirm)
+        validate_password(password, password_confirm)
 
         if not user.update_password(password):
             raise res_exc.UnableToCompleteError
@@ -183,12 +182,12 @@ class AccountService(object):
             raise res_exc.InvalidCredentialsError
 
         if not user.is_verified_email:
-            raise res_exc.EmailNotVerifiedError
+            raise res_exc.EmailNotVerifiedError(email)
 
-        return cls.__get_access_token(user.id)
+        return get_access_token(user.id)
 
     @staticmethod
-    def oauth_authentication(grant_type, token):
+    def authenticate_oauth(grant_type, token):
         """
         Authenticate a user via OAuth.
 
@@ -210,60 +209,3 @@ class AccountService(object):
         #    local user id.
 
         raise NotImplementedError
-
-    @classmethod
-    def __get_access_token(cls, identifier):
-        """
-        [PRIVATE] Generate and return an access token using the
-        provided identifier.
-
-        :param identifier: Unique id to identify this user.
-        :rtype: dict
-        """
-        return {'accessToken': create_access_token(identity=identifier)}
-
-    @classmethod
-    def __validate_password(cls, password, password_confirm=None):
-        """
-        Validate the provided password, optional password_confirm to
-        ensure password is entered correctly twice.
-
-        :param password: Password to validate
-        :type password: str
-        :param password_confirm: Optional password confirmation
-        :type password_confirm: str
-        :rtype: bool
-        """
-        re_symbol = r"[ !#$%&'()*+,-./[\\\]^_`{|}~" + r'"]'
-
-        length_error = len(password) < 8
-        digit_error = re.search(r"\d", password) is None
-        uppercase_error = re.search(r"[A-Z]", password) is None
-        lowercase_error = re.search(r"[a-z]", password) is None
-        symbol_error = re.search(re_symbol, password) is None
-        comparison_error = (
-            password_confirm
-            and not safe_str_cmp(password, password_confirm)
-        )
-
-        is_password_valid = not (
-            length_error or
-            digit_error or
-            uppercase_error or
-            lowercase_error or
-            symbol_error or
-            comparison_error
-        )
-
-        if not is_password_valid:
-            data = {
-                'length_error': length_error,
-                'digit_error': digit_error,
-                'uppercase_error': uppercase_error,
-                'lower_error': lowercase_error,
-                'symbol_error': symbol_error,
-                'comparison_error': comparison_error
-            }
-            raise res_exc.UnmetPasswordRequirementsError(data)
-
-        return True
