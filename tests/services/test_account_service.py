@@ -489,3 +489,22 @@ class TestAccountService(unittest.TestCase):
 
         # Assert
         user.find_by_email.assert_any_call('test@test.com')
+
+    @mock.patch('services.account_service.User')
+    @mock.patch('services.account_service.create_access_token')
+    def test__authenticate_user__valid(self, create_access_token, user):
+        """
+        """
+        # Arrange
+        mock_user = mock.MagicMock()
+        mock_user.verify_password.return_value = True
+        mock_user.is_verified_email.return_value = True
+        mock_user.id = 1
+        user.find_by_email.return_value = mock_user
+        create_access_token.return_value = 'test-token'
+
+        # Act
+        result = AccountService.authenticate_user('test@test.com', 'Password1!')
+
+        assert result['accessToken'] == 'test-token'
+        create_access_token.assert_any_call(identity=1)
