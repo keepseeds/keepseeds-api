@@ -2,13 +2,16 @@
 from flask_restful import Resource
 from webargs.flaskparser import use_args
 
-from services import AccountService
+from services import AccountService, FacebookService
 from .args import post_oauth_args
 
 class OAuth(Resource):
     """
     Resource for OAuth authentication.
     """
+
+    def get(self):
+        return FacebookService.debug_token('')
 
     @use_args(post_oauth_args)
     def post(self, args):
