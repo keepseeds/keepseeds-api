@@ -12,3 +12,19 @@ class UserGrant(db.Model, Base):
 
     user = db.relationship('User', back_populates='grants')
     grant = db.relationship('Grant', back_populates='users')
+
+    def __init__(self, user, grant, uid):
+        self.user = user
+        self.grant = grant
+        self.uid = uid
+
+    @classmethod
+    def find_by_uid(cls, grant_id, uid):
+        cls.query.filter_by(grant_id=grant_id, uid=uid).first()
+
+    @classmethod
+    def create(cls, user, grant, uid):
+        new_user_grant = cls(user, grant, uid)
+        db.session.add(new_user_grant)
+        db.session.commit()
+        return new_user_grant

@@ -29,7 +29,7 @@ class User(db.Model, Base):
     grants = db.relationship('UserGrant', back_populates='user')
     tokens = db.relationship('UserToken', back_populates='user')
 
-    def __init__(self, email, first, last, password):
+    def __init__(self, email, first, last, password=None):
         """
         :param email: Email address of user, should be unique.
         :type email: str
@@ -45,7 +45,9 @@ class User(db.Model, Base):
         self.last_name = last
         self.is_verified_email = False
         self.is_locked = False
-        self.encrypt_password(password)
+
+        if password:
+            self.encrypt_password(password)
 
     def encrypt_password(self, password):
         """
@@ -167,3 +169,12 @@ class User(db.Model, Base):
         verify_email_token = UserToken.create(new_user, token, token_expiry)
 
         return {"token": verify_email_token}
+
+    @classmethod
+    def create_oauth(cls, email, first, last):
+        new_user = cls(email, first, last)
+        new_user.is_verified_email = True
+        db.session.add(new_user)
+        db.session.commit()
+
+        return new_user

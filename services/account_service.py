@@ -2,10 +2,10 @@
 
 from flask_jwt_extended import get_jwt_identity
 
-from models import User, Token, UserToken
+from models import User, Token, UserToken, Grant, UserGrant
 from models.enums import TokenType
 from helpers import resource_exceptions as res_exc
-from .utils import get_access_token, validate_password
+from .utils import get_access_token, validate_password, validate_oauth_token
 
 
 class AccountService(object):
@@ -197,15 +197,28 @@ class AccountService(object):
         :type token: str
         :rtype: dict
         """
-        if grant_type not in ('facebook',):
+        # 1. Ensure we support grantType provided
+        grant = Grant.find_by_name(grant_type)
+        if not grant:
             raise res_exc.InvalidCredentialsError
 
-        # 1. Ensure we support grantType provided
         # 2. Look up user based on token via 3rd party, ensure the access token
         #    belongs to our app and they have granted required permissions.
+        user_detail = validate_oauth_token(grant_type, token)
+        if not user_detail:
+            raise res_exc.InvalidCredentialsError
+
         # 3. Look up user id locally in user_grants.
-        # 4. If the user doesn't exist we need to create it and get the id.
+        user_grant = UserGrant.find_by_uid(grant.id, user_detail['user_id'])
+        if not user_grant:
+            # 4. If the user doesn't exist we need to create it and get the id.
+            user = User.create_oauth(
+                email=user_detail['email'],
+                first=user_detail['first_name'],
+                last=user_detail['last_name'])
+
+            user_grant = UserGrant.create(user, grant, user_detail['user_id'])
+
         # 5. Finally, return an access token using get_access_token and our
         #    local user id.
-
-        raise NotImplementedError
+        return get_access_token(user_grant.user_id)
