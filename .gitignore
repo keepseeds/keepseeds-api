@@ -62,3 +62,9 @@ fabric.properties
 .cache
 
 \.coverage
+
+htmlcov/
+
+assets/
+
+report\.html
