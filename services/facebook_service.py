@@ -7,6 +7,7 @@ import yaml
 
 from helpers import resource_exceptions as res_exc
 
+
 class FacebookService(object):
     """
     Service for Facebook actions.
