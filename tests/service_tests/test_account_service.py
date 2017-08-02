@@ -543,5 +543,5 @@ class TestAccountService(unittest.TestCase):
     def test__authenticate_oauth__invalid_grant(self, grant):
         grant.find_by_name.return_value = None
 
-        with pytest.raises(res_exc.InvalidCredentialsError):
+        with pytest.raises(res_exc.UnableToCompleteError):
             AccountService.authenticate_oauth('google', 'test-token')

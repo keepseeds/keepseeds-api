@@ -29,13 +29,17 @@ class AccountService(object):
         :type password_confirm: str
         :rtype: str
         """
+        # Look up the user, if it exists, check if email is registered 
+        # via OAuth.
         user = User.find_by_email(email)
         if user:
             raise res_exc.EmailAlreadyExistsError(email) if user.password_hash \
             else res_exc.OAuthUserExistsError(email)
 
+        # Ensure the password meets our password standards.
         validate_password(password, password_confirm)
 
+        # Create a new user, and return the object.
         create_user_result = User.create(email, first, last, password)
 
         return create_user_result
@@ -198,31 +202,33 @@ class AccountService(object):
         :type token: str
         :rtype: dict
         """
-        # 1. Ensure we support grantType provided
+        # Ensure we support grantType provided
         grant = Grant.find_by_name(grant_type)
         if not grant:
-            raise res_exc.InvalidCredentialsError
+            raise res_exc.UnableToCompleteError
 
-        # 2. Look up user based on token via 3rd party, ensure the access token
-        #    belongs to our app and they have granted required permissions.
+        # Look up user based on token via 3rd party, ensure the access token
+        # belongs to our app and they have granted required permissions.
         user_detail = validate_oauth_token(grant_type, token)
         if not user_detail:
             raise res_exc.InvalidCredentialsError
 
-        # 3. Look up user id locally in user_grants.
+        # Look up user id locally in user_grants.
         user_grant = UserGrant.find_by_uid(grant.id, user_detail['user_id'])
         if not user_grant:
             user = User.find_by_email(user_detail['email'])
 
-            if not user:
-                # 4. If the user doesn't exist we need to create it and get the id.
-                user = User.create_oauth(
-                    email=user_detail['email'],
-                    first=user_detail['first_name'],
-                    last=user_detail['last_name'])
+            if user:
+                raise res_exc.EmailAlreadyExistsError(user.email)
+
+            # If the user doesn't exist we need to create it and get the id.
+            user = User.create_oauth(
+                email=user_detail['email'],
+                first=user_detail['first_name'],
+                last=user_detail['last_name'])
 
             user_grant = UserGrant.create(user, grant, user_detail['user_id'])
 
-        # 5. Finally, return an access token using get_access_token and our
-        #    local user id.
+        # Finally, return an access token using get_access_token 
+        # and our local user id.
         return get_access_token(user_grant.user_id)
