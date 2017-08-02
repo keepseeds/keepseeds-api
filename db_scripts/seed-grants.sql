@@ -8,5 +8,5 @@ INSERT INTO grants (
      1
     ,current_timestamp
     ,'facebook'
-    ,1
+    ,TRUE
 )
