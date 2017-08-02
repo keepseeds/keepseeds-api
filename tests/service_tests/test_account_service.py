@@ -539,12 +539,9 @@ class TestAccountService(unittest.TestCase):
 
         user.find_by_email.assert_any_call('test@test.com')
 
-    def test__authenticate_oauth__invalid_grant(self):
+    @mock.patch('services.account_service.Grant')
+    def test__authenticate_oauth__invalid_grant(self, grant):
+        grant.find_by_name.return_value = None
 
-        with pytest.raises(res_exc.InvalidCredentialsError):
+        with pytest.raises(res_exc.UnableToCompleteError):
             AccountService.authenticate_oauth('google', 'test-token')
-
-    def test__authenticate_oauth__raises_not_implemented(self):
-
-        with pytest.raises(NotImplementedError):
-            AccountService.authenticate_oauth('facebook', 'test-token')

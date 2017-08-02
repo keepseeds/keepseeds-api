@@ -2,10 +2,10 @@
 
 from flask_jwt_extended import get_jwt_identity
 
-from models import User, Token, UserToken
+from models import User, Token, UserToken, Grant, UserGrant
 from models.enums import TokenType
 from helpers import resource_exceptions as res_exc
-from .utils import get_access_token, validate_password
+from .utils import get_access_token, validate_password, validate_oauth_token
 
 
 class AccountService(object):
@@ -29,12 +29,17 @@ class AccountService(object):
         :type password_confirm: str
         :rtype: str
         """
+        # Look up the user, if it exists, check if email is registered 
+        # via OAuth.
+        user = User.find_by_email(email)
+        if user:
+            raise res_exc.EmailAlreadyExistsError(email) if user.password_hash \
+            else res_exc.OAuthUserExistsError(email)
 
-        if User.find_by_email(email):
-            raise res_exc.EmailAlreadyExistsError(email)
-
+        # Ensure the password meets our password standards.
         validate_password(password, password_confirm)
 
+        # Create a new user, and return the object.
         create_user_result = User.create(email, first, last, password)
 
         return create_user_result
@@ -197,15 +202,33 @@ class AccountService(object):
         :type token: str
         :rtype: dict
         """
-        if grant_type not in ('facebook',):
+        # Ensure we support grantType provided
+        grant = Grant.find_by_name(grant_type)
+        if not grant:
+            raise res_exc.UnableToCompleteError
+
+        # Look up user based on token via 3rd party, ensure the access token
+        # belongs to our app and they have granted required permissions.
+        user_detail = validate_oauth_token(grant_type, token)
+        if not user_detail:
             raise res_exc.InvalidCredentialsError
 
-        # 1. Ensure we support grantType provided
-        # 2. Look up user based on token via 3rd party, ensure the access token
-        #    belongs to our app and they have granted required permissions.
-        # 3. Look up user id locally in user_grants.
-        # 4. If the user doesn't exist we need to create it and get the id.
-        # 5. Finally, return an access token using get_access_token and our
-        #    local user id.
+        # Look up user id locally in user_grants.
+        user_grant = UserGrant.find_by_uid(grant.id, user_detail['user_id'])
+        if not user_grant:
+            user = User.find_by_email(user_detail['email'])
 
-        raise NotImplementedError
+            if user:
+                raise res_exc.EmailAlreadyExistsError(user.email)
+
+            # If the user doesn't exist we need to create it and get the id.
+            user = User.create_oauth(
+                email=user_detail['email'],
+                first=user_detail['first_name'],
+                last=user_detail['last_name'])
+
+            user_grant = UserGrant.create(user, grant, user_detail['user_id'])
+
+        # Finally, return an access token using get_access_token 
+        # and our local user id.
+        return get_access_token(user_grant.user_id)

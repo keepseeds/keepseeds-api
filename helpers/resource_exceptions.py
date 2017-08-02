@@ -33,6 +33,15 @@ class EmailAlreadyExistsError(ResourceError):
     def __init__(self, email):
         ResourceError.__init__(self, {'email': email})
 
+class OAuthUserExistsError(EmailAlreadyExistsError):
+    """
+    Error thrown when the provided email already exists for an OAuth user.
+    """
+    code = 401
+
+    def __init__(self, email):
+        EmailAlreadyExistsError.__init__(self, email)
+
 
 class UserNotFoundError(ResourceError):
     """
@@ -87,6 +96,15 @@ class EmailNotVerifiedError(ResourceError):
     def __init__(self, email):
         ResourceError.__init__(self, {'email': email})
 
+class FacebookInvalidPermissionsError(ResourceError):
+    """
+    The facebook user has not provided adequate permissions to the app.
+    """
+    code = 401
+
+    def __init__(self, data):
+        ResourceError.__init__(self, data)
+
 #
 # Dictionary of Exception Types
 #
@@ -117,6 +135,11 @@ resource_errors = {
         'message': 'The provided email is already registered.',
         'status': 400
     },
+    'OAuthUserExistsError': {
+        'error_code': 'OAUTH_USER_EXISTS',
+        'message': 'The provided credentials already belong to oauth user.',
+        'status': 401
+    },
     'UserNotFoundError': {
         'error_code': 'USER_NOT_FOUND',
         'message': 'Could not find the requested user.',
@@ -131,6 +154,11 @@ resource_errors = {
         'error_code': 'EMAIL_NOT_VERIFIED',
         'message': 'The provided email is not verified.',
         'status': 401
+    },
+    'FacebookInvalidPermissionsError': {
+        'error_code': 'FACEBOOK_INVALID_PERMISSIONS',
+        'message': 'The facebook user has not provided adequate permissions.',
+        'status': 401
     }
 }
 
@@ -143,5 +171,7 @@ __all__ = [
     'EmailAlreadyExistsError',
     'InvalidTokenError',
     'EmailNotVerifiedError',
+    'FacebookInvalidPermissionsError',
+    'OAuthUserExistsError',
     'resource_errors'
 ]
