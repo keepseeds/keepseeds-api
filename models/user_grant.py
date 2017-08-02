@@ -6,7 +6,7 @@ from .mixins import Base
 class UserGrant(db.Model, Base):
     __tablename__ = 'user_grants'
 
-    uid = db.Column(db.Integer)
+    uid = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     grant_id = db.Column(db.Integer, db.ForeignKey('grants.id'), primary_key=True)
 

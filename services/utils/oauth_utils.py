@@ -1,5 +1,5 @@
 
-from services import FacebookService
+from services.facebook_service import FacebookService
 
 
 def validate_oauth_token(grant_type, token):
