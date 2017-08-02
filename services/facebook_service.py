@@ -16,7 +16,7 @@ class FacebookService(object):
 
         if not app_id and not app_secret:
             # No environment variables, use yaml file instead.
-            with open('app_config.yaml') as stream:
+            with open('app_config.yml') as stream:
                 try:
                     config = yaml.load(stream)
                     app_id = config['facebook_app']['app_id']
