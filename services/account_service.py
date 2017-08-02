@@ -29,9 +29,10 @@ class AccountService(object):
         :type password_confirm: str
         :rtype: str
         """
-
-        if User.find_by_email(email):
-            raise res_exc.EmailAlreadyExistsError(email)
+        user = User.find_by_email(email)
+        if user:
+            raise res_exc.EmailAlreadyExistsError(email) if user.password_hash \
+            else res_exc.OAuthUserExistsError(email)
 
         validate_password(password, password_confirm)
 
@@ -211,11 +212,14 @@ class AccountService(object):
         # 3. Look up user id locally in user_grants.
         user_grant = UserGrant.find_by_uid(grant.id, user_detail['user_id'])
         if not user_grant:
-            # 4. If the user doesn't exist we need to create it and get the id.
-            user = User.create_oauth(
-                email=user_detail['email'],
-                first=user_detail['first_name'],
-                last=user_detail['last_name'])
+            user = User.find_by_email(user_detail['email'])
+
+            if not user:
+                # 4. If the user doesn't exist we need to create it and get the id.
+                user = User.create_oauth(
+                    email=user_detail['email'],
+                    first=user_detail['first_name'],
+                    last=user_detail['last_name'])
 
             user_grant = UserGrant.create(user, grant, user_detail['user_id'])
 

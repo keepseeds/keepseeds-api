@@ -5,12 +5,45 @@ import os
 import facebook
 import yaml
 
+from helpers import resource_exceptions as res_exc
+
 class FacebookService(object):
     """
     Service for Facebook actions.
     """
+    @classmethod
+    def get_user_details_by_token(cls, token):
+        """
+        Provided with an access token, look up the user - returning
+        basic details.
+
+        :param token: Access token of user.
+        :type token: str
+        :rtype: dict
+        """
+        graph = cls.__get_graph()
+
+        try:
+            debug_result = graph.get_object('debug_token', input_token=token)
+            if not debug_result['data'] or not debug_result['data']['is_valid']:
+                raise res_exc.InvalidCredentialsError
+        except facebook.GraphAPIError:
+            raise res_exc.UnableToCompleteError
+
+        user_result = graph.get_object(
+            id=debug_result['data']['user_id'],
+            fields='first_name,last_name,email'
+        )
+        if not user_result['email']:
+            raise res_exc.FacebookInvalidPermissionsError('email')
+
+        return user_result
+
     @staticmethod
     def __get_graph():
+        """
+        Return a new instance of the Facebook Graph API using the app creds.
+        """
         app_id = os.environ.get('FACEBOOK_APP_ID')
         app_secret = os.environ.get('FACEBOOK_APP_SECRET')
 
@@ -29,29 +62,3 @@ class FacebookService(object):
             timeout=1000,
             version='2.7'
         )
-
-    @classmethod
-    def get_user_details_by_token(cls, token):
-        """
-        Provided with an access token, look up the user - returning
-        basic details.
-
-        :param token: Access token of user.
-        :type token: str
-        :rtype: dict
-        """
-        graph = cls.__get_graph()
-
-        debug_result = graph.get_object('debug_token', input_token=token)
-        if not debug_result['data'] or not debug_result['data']['is_valid']:
-            print(debug_result)
-            raise Exception()
-
-        user_id = debug_result['data']['user_id']
-
-        user_result = graph.get_object(
-            id=user_id,
-            fields='first_name,last_name,email'
-        )
-
-        return user_result
