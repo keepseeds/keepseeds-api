@@ -3,6 +3,7 @@ from db import db
 
 from .mixins import Base
 
+
 class UserGrant(db.Model, Base):
     __tablename__ = 'user_grants'
 
@@ -20,7 +21,7 @@ class UserGrant(db.Model, Base):
 
     @classmethod
     def find_by_uid(cls, grant_id, uid):
-        cls.query.filter_by(grant_id=grant_id, uid=uid).first()
+        return cls.query.filter_by(grant_id=grant_id, uid=uid).first()
 
     @classmethod
     def create(cls, user, grant, uid):
