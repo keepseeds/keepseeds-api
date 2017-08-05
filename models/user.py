@@ -11,6 +11,7 @@ from .user_token import UserToken
 from .mixins import Base
 from .enums import TokenType
 
+
 class User(db.Model, Base):
     """
     Represents a User in the database.
@@ -55,7 +56,6 @@ class User(db.Model, Base):
 
         :param password: Password to set as password_hash.
         :type password: str
-
         :rtype str
         """
         self.password_hash = pbkdf2_sha256.hash(password)
@@ -77,13 +77,19 @@ class User(db.Model, Base):
 
         :param is_locked: Requested value of this users is_locked property.
         :type is_locked: bool
-
         :rtype None
         """
         self.is_locked = is_locked
         db.session.commit()
 
     def update_password(self, password):
+        """
+        Set the user's password to a new value.
+
+        :param password:
+        :type password: str
+        :rtype: bool
+        """
         self.encrypt_password(password)
         db.session.commit()
         return True
@@ -91,6 +97,7 @@ class User(db.Model, Base):
     def set_is_verified_email(self, is_verified_email=True):
         """
         Set the user's verified email state.
+
         :param is_verified_email:
         :return:
         """
@@ -106,18 +113,15 @@ class User(db.Model, Base):
 
         :param email: User's email to find in database.
         :type email: str
-
         :param is_locked: Whether to return locked or unlocked accounts.
         :type is_locked: bool
-
         :param delete_date_time: Date at which the user has been deleted.
         :type delete_date_time: datetime
-
         :rtype: User
         """
         res = cls.query.filter_by(email=email,
-                   is_locked=is_locked,
-                   delete_date_time=delete_date_time)
+                                  is_locked=is_locked,
+                                  delete_date_time=delete_date_time)
 
         return res.first()
 
@@ -125,15 +129,13 @@ class User(db.Model, Base):
     def find_by_id(cls, _id, is_locked=False, delete_date_time=None):
         """
         Find a single User based on id.
+
         :param _id:
         :type _id: int
-
         :param is_locked:
         :type is_locked: bool
-
         :param delete_date_time:
         :type delete_date_time: datetime
-
         :rtype User
         """
         return cls.query.filter_by(id=_id,
@@ -147,16 +149,12 @@ class User(db.Model, Base):
 
         :param email: Email address to assign to new user, should be unique.
         :type email: str
-
         :param first: First name of new user.
         :type first: str
-
         :param last: Last name of new user.
         :type last: str
-
         :param password: Password to assign to user.
         :type password: str
-
         :rtype: dict
         """
         new_user = cls(email, first, last, password)
@@ -172,6 +170,17 @@ class User(db.Model, Base):
 
     @classmethod
     def create_oauth(cls, email, first, last):
+        """
+        Create a new user in the database using the provided values.
+
+        :param email: Email address of user.
+        :type email: str
+        :param first: First name of user.
+        :type first: str
+        :param last: Last name of user.
+        :type last: str
+        :rtype: User
+        """
         new_user = cls(email, first, last)
         new_user.is_verified_email = True
         db.session.add(new_user)

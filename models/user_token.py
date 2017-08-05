@@ -141,13 +141,10 @@ class UserToken(db.Model, Base):
         """
         new_user_token = cls(user, token, expires_date_time)
 
-        token_value = None
-        try:
-            token_value = new_user_token.generate_encrypt_token()
+        token_value = new_user_token.generate_encrypt_token()
 
-            db.session.add(new_user_token)
-            db.session.commit()
+        db.session.add(new_user_token)
+        db.session.commit()
 
-            cls.expire_existing_tokens(user.id, token.id, new_user_token.id)
-        finally:
-            return token_value
+        cls.expire_existing_tokens(user.id, token.id, new_user_token.id)
+        return token_value
