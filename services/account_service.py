@@ -1,7 +1,5 @@
 """Module containing the AccountService definition."""
 
-from flask_jwt_extended import get_jwt_identity
-
 from models import User, Token, UserToken, Grant, UserGrant
 from models.enums import TokenType
 from helpers import resource_exceptions as res_exc
@@ -79,7 +77,7 @@ class AccountService(object):
         return True
 
     @classmethod
-    def change_password(cls, old_password, password, password_confirm):
+    def change_password(cls, old_password, password, password_confirm, user_id):
         """
         Change the password for a user.
 
@@ -94,7 +92,7 @@ class AccountService(object):
         :rtype: bool
         """
 
-        user = User.find_by_id(get_jwt_identity())
+        user = User.find_by_id(user_id)
 
         if not user:
             raise res_exc.UserNotFoundError

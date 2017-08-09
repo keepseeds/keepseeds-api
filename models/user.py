@@ -29,6 +29,7 @@ class User(db.Model, Base):
 
     grants = db.relationship('UserGrant', back_populates='user')
     tokens = db.relationship('UserToken', back_populates='user')
+    children = db.relationship('UserChild', back_populates='user')
 
     def __init__(self, email, first, last, password=None):
         """

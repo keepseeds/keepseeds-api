@@ -1,1 +1,1 @@
-from .child_resource import ChildResource
+from .child_resource import Child
