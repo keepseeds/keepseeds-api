@@ -5,9 +5,10 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs.flaskparser import use_args
 
+from services import ChildService
 from .args import put_child_args
 
-class ChildResource(Resource):
+class Child(Resource):
     """
     Represents a Child resource in the API.
     """
@@ -17,7 +18,10 @@ class ChildResource(Resource):
         """
         Get a specific Child entity.
         """
-        pass
+        user_id = get_jwt_identity()
+        result = ChildService.find_child(_id=child_id, user_id=user_id)
+
+        return result
 
 
     @jwt_required
@@ -37,4 +41,3 @@ class ChildResource(Resource):
         Mark a Child entity as deleted.
         """
         pass
-

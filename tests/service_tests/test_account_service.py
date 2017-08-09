@@ -154,14 +154,11 @@ class TestAccountService(unittest.TestCase):
         mock_user.find_by_email.assert_any_call('test@test.com')
 
     @mock.patch('services.account_service.User')
-    @mock.patch('services.account_service.get_jwt_identity')
-    def test__change_password__valid(self, get_jwt_identity, user):
+    def test__change_password__valid(self, user):
         """
         Should return True
         """
         # Arrange
-        mock_user_id = 1
-        get_jwt_identity.return_value = mock_user_id
         mock_user = mock.MagicMock()
         mock_user.email = 'test@test.com'
         mock_user.verify_password.return_value = True
@@ -172,21 +169,20 @@ class TestAccountService(unittest.TestCase):
         assert AccountService.change_password(
             password='Password1!',
             password_confirm='Password1!',
-            old_password='Password0!')
+            old_password='Password0!',
+            user_id=1)
 
         # Assert
         mock_user.verify_password.assert_any_call('Password0!')
         mock_user.update_password.assert_any_call('Password1!')
-        user.find_by_id.assert_any_call(mock_user_id)
+        user.find_by_id.assert_any_call(1)
 
     @mock.patch('services.account_service.User')
-    @mock.patch('services.account_service.get_jwt_identity')
-    def test__change_password__invalid_email(self, get_jwt_identity, user):
+    def test__change_password__invalid_email(self, user):
         """
         Should raise a UserNotFoundError
         """
         # Arrange
-        get_jwt_identity.return_value = 1
         user.find_by_id.return_value = None
 
         # Act
@@ -194,21 +190,18 @@ class TestAccountService(unittest.TestCase):
             AccountService.change_password(
                 password='Password1!',
                 password_confirm='Password1!',
-                old_password='Password0!')
+                old_password='Password0!',
+                user_id=1)
 
         # Assert
-        get_jwt_identity.assert_any_call()
         user.find_by_id.assert_any_call(1)
 
     @mock.patch('services.account_service.User')
-    @mock.patch('services.account_service.get_jwt_identity')
-    def test__change_password__bad_password(self, get_jwt_identity, user):
+    def test__change_password__bad_password(self, user):
         """
         Should raise an UnableToCompleteError
         """
         # Arrange
-        mock_user_id = 1
-        get_jwt_identity.return_value = mock_user_id
         mock_user = mock.MagicMock()
         mock_user.verify_password.return_value = False
         user.find_by_id.return_value = mock_user
@@ -218,22 +211,19 @@ class TestAccountService(unittest.TestCase):
             AccountService.change_password(
                 password='Password1!',
                 password_confirm='Password1!',
-                old_password='Password0!')
+                old_password='Password0!',
+                user_id=1)
 
         # Assert
-        get_jwt_identity.assert_any_call()
         mock_user.verify_password.assert_any_call('Password0!')
-        user.find_by_id.assert_any_call(mock_user_id)
+        user.find_by_id.assert_any_call(1)
 
     @mock.patch('services.account_service.User')
-    @mock.patch('services.account_service.get_jwt_identity')
-    def test__change_password__unable_to_update(self, get_jwt_identity, user):
+    def test__change_password__unable_to_update(self, user):
         """
         Should raise an UnableToCompleteError
         """
         # Arrange
-        mock_user_id = 1
-        get_jwt_identity.return_value = mock_user_id
         mock_user = mock.MagicMock()
         mock_user.verify_password.return_value = True
         mock_user.update_password.return_value = False
@@ -244,13 +234,13 @@ class TestAccountService(unittest.TestCase):
             AccountService.change_password(
                 password='Password1!',
                 password_confirm='Password1!',
-                old_password='Password0!')
+                old_password='Password0!',
+                user_id=1)
 
         # Assert
-        get_jwt_identity.assert_any_call()
         mock_user.verify_password.assert_any_call('Password0!')
         mock_user.update_password.assert_any_call('Password1!')
-        user.find_by_id.assert_any_call(mock_user_id)
+        user.find_by_id.assert_any_call(1)
 
     @mock.patch('services.account_service.User')
     @mock.patch('services.account_service.Token')

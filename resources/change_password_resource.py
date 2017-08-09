@@ -1,9 +1,9 @@
 """
 Module for the ChangePassword class, this class interacts
-with the database via SQLAlchemy.
+with the database via AccountService.
 """
 from flask_restful import Resource
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs.flaskparser import use_args
 
 from services import AccountService
@@ -25,7 +25,8 @@ class ChangePassword(Resource):
         AccountService.change_password(
             old_password,
             password,
-            password_confirm
+            password_confirm,
+            get_jwt_identity()
         )
 
         return {'message': 'Done.'}, 204

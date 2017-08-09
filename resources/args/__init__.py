@@ -7,3 +7,4 @@ from .oauth import get_oauth_args, post_oauth_args
 from .register import post_register_args
 from .reset_password import post_reset_password_args, put_reset_password_args
 from .verify_email import post_verify_email_args
+from .children import post_children_args

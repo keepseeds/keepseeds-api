@@ -10,7 +10,7 @@ from .oauth_resource import OAuth
 from .verify_email import VerifyEmail
 
 # Collection Entity resources
-from .children_resource import ChildrenResource
+from .children_resource import Children
 
 # Single Entity resources
-from .single import ChildResource
+from .single import Child
