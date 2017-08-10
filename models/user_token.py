@@ -10,19 +10,23 @@ from .mixins import Base
 from .token import Token
 
 
-
 class UserToken(db.Model, Base):
     """
     Represents the relationship between a user and the user's tokens.
     Examples of this relationship include Reset Password and Verify Email.
     """
+
+    # SQLAlchemy Configuration
     __tablename__ = 'user_tokens'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    token_id = db.Column(db.Integer, db.ForeignKey('tokens.id'))
     token_hash = db.Column(db.String(4000), unique=True, nullable=False)
     expires_date_time = db.Column(db.DateTime, nullable=False)
 
+    # Foreign Keys
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    token_id = db.Column(db.Integer, db.ForeignKey('tokens.id'))
+
+    # Entity Lookups
     user = db.relationship('User', back_populates='tokens')
     token = db.relationship('Token', back_populates='users')
 
@@ -131,10 +135,11 @@ class UserToken(db.Model, Base):
         """
         Create a new UserToken entry in to user_tokens for the provided
         user and token relationship.
+
         :param user: User to associate this UserToken with.
-        :type user: User
+        :type user: models.User
         :param token: Token type to associate with this UserToken
-        :type token: Token
+        :type token: models.Token
         :param expires_date_time: [Optional] Expiry date of token.
         :type expires_date_time: datetime
         :rtype: str

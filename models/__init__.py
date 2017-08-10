@@ -7,3 +7,4 @@ from .user import User
 from .user_grant import UserGrant
 from .user_token import UserToken
 from .child import Child
+from .user_child import UserChild

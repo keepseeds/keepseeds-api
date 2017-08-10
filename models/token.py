@@ -1,4 +1,6 @@
-
+"""
+Module for Token model.
+"""
 from db import db
 from .enums import TokenType
 from .mixins import Base
