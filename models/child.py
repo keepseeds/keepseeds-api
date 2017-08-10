@@ -1,5 +1,9 @@
+"""
+Module for Child model.
+"""
 from db import db
 from .mixins import Base
+
 
 class Child(db.Model, Base):
     """
@@ -15,8 +19,10 @@ class Child(db.Model, Base):
     date_of_birth = db.Column(db.DateTime, nullable=False)
     gender = db.Column(db.Integer, nullable=False)
 
-    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    # Foreign Keys
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+    # Entity Lookups
     users = db.relationship('UserChild', back_populates='child')
 
     def __init__(self, first_name, last_name, date_of_birth, gender, middle_name=None):

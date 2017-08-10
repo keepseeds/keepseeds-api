@@ -4,6 +4,7 @@ Base module for Models
 from datetime import datetime
 from sqlalchemy import Column, Integer, DateTime
 
+
 class Base(object):
     """
     Base Mixin, provides:

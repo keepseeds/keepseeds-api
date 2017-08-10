@@ -18,6 +18,7 @@ class Grant(db.Model, Base):
     name = db.Column(db.String(100), nullable=False)
     is_enabled = db.Column(db.Boolean, nullable=False)
 
+    # Entity Lookups
     users = db.relationship('UserGrant', back_populates='grant')
 
     @classmethod

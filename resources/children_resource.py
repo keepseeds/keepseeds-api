@@ -9,6 +9,7 @@ from webargs.flaskparser import use_args
 from services import ChildService
 from .args import post_children_args
 
+
 class Children(Resource):
     """
     Represents the Children resource in the API.

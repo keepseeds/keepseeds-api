@@ -12,6 +12,9 @@ from flask_restful import HTTPException
 
 
 class ResourceError(HTTPException):
+    """
+    Base exception for resource errors.
+    """
     def __init__(self, data={}):
         HTTPException.__init__(self)
         self.data = {'error_data': data}
@@ -32,6 +35,7 @@ class EmailAlreadyExistsError(ResourceError):
 
     def __init__(self, email):
         ResourceError.__init__(self, {'email': email})
+
 
 class OAuthUserExistsError(EmailAlreadyExistsError):
     """
@@ -96,9 +100,30 @@ class EmailNotVerifiedError(ResourceError):
     def __init__(self, email):
         ResourceError.__init__(self, {'email': email})
 
+
 class FacebookInvalidPermissionsError(ResourceError):
     """
     The facebook user has not provided adequate permissions to the app.
+    """
+    code = 401
+
+    def __init__(self, data):
+        ResourceError.__init__(self, data)
+
+
+class ChildNotFoundError(ResourceError):
+    """
+    The child entity required could not be found.
+    """
+    code = 404
+
+    def __init__(self, data):
+        ResourceError.__init__(self, data)
+
+
+class PermissionDeniedError(ResourceError):
+    """
+    The resource requested requires elevated permissions.
     """
     code = 401
 
@@ -158,6 +183,16 @@ resource_errors = {
     'FacebookInvalidPermissionsError': {
         'error_code': 'FACEBOOK_INVALID_PERMISSIONS',
         'message': 'The facebook user has not provided adequate permissions.',
+        'status': 401
+    },
+    'ChildNotFoundError': {
+        'error_code': 'CHILD_NOT_FOUND',
+        'message': 'The child entity required could not be found.',
+        'status': 404
+    },
+    'PermissionDeniedError': {
+        'error_code': 'PERMISSION_DENIED',
+        'message': 'The resource requested requires elevated permissions.',
         'status': 401
     }
 }
