@@ -4,9 +4,9 @@ Webarg definitions for register_resource.
 from marshmallow.fields import Str
 
 post_register_args = {
-    'firstName': Str(required=True),
-    'lastName': Str(required=True),
+    'first_name': Str(required=True),
+    'last_name': Str(required=True),
     'email': Str(required=True),
     'password': Str(required=True),
-    'passwordConfirm': Str(required=True)
+    'password_confirm': Str(required=True)
 }

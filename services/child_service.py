@@ -1,3 +1,4 @@
+"""Module containing the ChildService definition."""
 
 from db import db
 from models import Child, UserChild
@@ -11,13 +12,16 @@ class ChildService(BaseService):
     """
 
     @classmethod
-    def create(cls, first, last, dob, gender, middle):
-        new_child = Child(first, last, dob, gender, middle)
-        cls.add(new_child, True)
+    def create(cls, first, last, dob, gender, created_by, middle):
+        new_child = Child(first, last, dob, gender, created_by, middle)
+        Child.add(new_child)
         return new_child
 
     @staticmethod
     def find_child(_id, user_id):
+        """
+        Provided with a child id and user id, find the child.
+        """
         child = Child.query\
             .filter_by(
                 id=_id,
@@ -27,12 +31,28 @@ class ChildService(BaseService):
         if not child:
             raise res_exc.ChildNotFoundError({'id': _id})
 
-        if not any(u for u in child.users if u.id == user_id):
+        if not any(u for u in child.users if u.user_id == user_id):
             raise res_exc.PermissionDeniedError({'id': _id})
 
         return child
 
     @staticmethod
-    def find_children(user_id):
-        uc_result = UserChild.query.filter_by(user_id=user_id, delete_date_time=None).all()
-        return [uc.child for uc in uc_result]
+    def find_users_children(user_id):
+        """
+        Provided with a user_id, look up the children either owned or granted
+        access to.
+
+        :param user_id: User's ID to query for children.
+        :type user_id: int
+        :rtype: dict
+        """
+        uc_result = UserChild.query\
+            .filter_by(
+                user_id=user_id,
+                delete_date_time=None
+            ).all()  # type: models.UserChild
+
+        return {
+            'owned': [uc.child for uc in uc_result if uc.is_primary],
+            'included': [uc.child for uc in uc_result if not uc.is_primary]
+        }

@@ -1,4 +1,4 @@
-from resources.args.account_auth import post_account_auth_args
+from resources._args.account_auth import post_account_auth_args
 
 """
 {

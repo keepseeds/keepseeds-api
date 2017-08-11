@@ -3,7 +3,7 @@ from flask_restful import Resource
 from webargs.flaskparser import use_args
 
 from services import AccountService
-from .args import put_reset_password_args, post_reset_password_args
+from resources._args import put_reset_password_args, post_reset_password_args
 
 
 class ResetPassword(Resource):
@@ -21,7 +21,7 @@ class ResetPassword(Resource):
     def post(self, args):
         email = args['email']
         password = args['password']
-        password_confirm = args['passwordConfirm']
+        password_confirm = args['password_confirm']
         token = args['token']
 
         AccountService.resolve_password_reset(

@@ -6,7 +6,7 @@ from flask_restful import Resource
 from webargs.flaskparser import use_args
 
 from services import AccountService
-from .args import post_oauth_args #, get_oauth_args
+from resources._args import post_oauth_args #, get_oauth_args
 
 class OAuth(Resource):
     """
@@ -23,7 +23,7 @@ class OAuth(Resource):
 
     @use_args(post_oauth_args)
     def post(self, args):
-        grant_type = args['grantType']
+        grant_type = args['grant_type']
         token = args['token']
 
         result = AccountService.authenticate_oauth(grant_type, token)

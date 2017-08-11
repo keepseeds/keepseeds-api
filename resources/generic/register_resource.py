@@ -6,7 +6,7 @@ from flask_restful import Resource
 from webargs.flaskparser import use_args
 
 from services import AccountService
-from .args import post_register_args
+from resources._args import post_register_args
 
 
 class Register(Resource):
@@ -20,10 +20,10 @@ class Register(Resource):
         Registration request.
         """
         email = args['email']
-        first = args['firstName']
-        last = args['lastName']
+        first = args['first_name']
+        last = args['last_name']
         password = args['password']
-        password_confirm = args['passwordConfirm']
+        password_confirm = args['password_confirm']
 
         create_user_result = AccountService.register_user(
             email,

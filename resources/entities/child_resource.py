@@ -1,12 +1,14 @@
 """
 Resource module for the ChildResource class.
 """
-from flask_restful import Resource
+from flask_restful import Resource, marshal_with
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs.flaskparser import use_args
 
+
 from services import ChildService
-from .args import put_child_args
+from resources._args import put_child_args
+from resources._marshallers import single_child_marshal
 
 class Child(Resource):
     """
@@ -14,6 +16,7 @@ class Child(Resource):
     """
 
     @jwt_required
+    @marshal_with(single_child_marshal)
     def get(self, child_id):
         """
         Get a specific Child entity.

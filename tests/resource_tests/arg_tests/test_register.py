@@ -1,4 +1,4 @@
-from resources.args.register import post_register_args
+from resources._args.register import post_register_args
 
 """
 {
@@ -11,8 +11,8 @@ from resources.args.register import post_register_args
 """
 def test__post_register_args__keys():
     assert len(post_register_args.keys()) == 5
-    assert 'firstName' in post_register_args.keys()
-    assert 'lastName' in post_register_args.keys()
+    assert 'first_name' in post_register_args.keys()
+    assert 'last_name' in post_register_args.keys()
     assert 'email' in post_register_args.keys()
     assert 'password' in post_register_args.keys()
-    assert 'passwordConfirm' in post_register_args.keys()
+    assert 'password_confirm' in post_register_args.keys()
