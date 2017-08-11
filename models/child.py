@@ -25,9 +25,10 @@ class Child(db.Model, Base):
     # Entity Lookups
     users = db.relationship('UserChild', back_populates='child')
 
-    def __init__(self, first_name, last_name, date_of_birth, gender, middle_name=None):
+    def __init__(self, first_name, last_name, date_of_birth, gender, created_by, middle_name=None):
         self.first_name = first_name
         self.last_name = last_name
         self.date_of_birth = date_of_birth
         self.gender = gender
+        self.created_by = created_by
         self.middle_name = middle_name

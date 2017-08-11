@@ -2,12 +2,13 @@
 Module for the ChildrenResource class, this class interacts
 with the database via ChildService.
 """
-from flask_restful import Resource
+from flask_restful import Resource, marshal_with, marshal
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs.flaskparser import use_args
 
 from services import ChildService
-from .args import post_children_args
+from resources._args import post_children_args
+from resources._marshallers import list_child_marshal, single_child_marshal
 
 
 class Children(Resource):
@@ -20,9 +21,15 @@ class Children(Resource):
         """
         Get all children for the current user.
         """
-        return ChildService.find_children(get_jwt_identity()), 200
+        result = ChildService.find_users_children(get_jwt_identity())
+
+        return {
+            'owned': marshal(result['owned'], list_child_marshal),
+            'included': marshal(result['included'], list_child_marshal)
+        }, 200
 
     @jwt_required
+    @marshal_with(single_child_marshal)
     @use_args(post_children_args)
     def post(self, args):
         """
@@ -32,8 +39,14 @@ class Children(Resource):
         last = args['last_name']
         dob = args['date_of_birth']
         gender = args['gender']
-        middle = args['middle_name']
+        middle = args.get('middle_name', None)
 
-        result = ChildService.create(first, last, dob, gender, middle)
+        result = ChildService.create(
+            first=first,
+            last=last,
+            dob=dob,
+            gender=gender,
+            created_by=get_jwt_identity(),
+            middle=middle)
 
         return result, 201

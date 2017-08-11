@@ -1,4 +1,4 @@
-from resources.args.oauth import post_oauth_args
+from resources._args.oauth import post_oauth_args
 
 """
 {
@@ -8,5 +8,5 @@ from resources.args.oauth import post_oauth_args
 """
 def test__post_oauth_args__keys():
     assert len(post_oauth_args.keys()) == 2
-    assert 'grantType' in post_oauth_args.keys()
+    assert 'grant_type' in post_oauth_args.keys()
     assert 'token' in post_oauth_args.keys()

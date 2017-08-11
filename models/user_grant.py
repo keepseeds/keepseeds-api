@@ -56,6 +56,5 @@ class UserGrant(db.Model, Base):
         :rtype: UserGrant
         """
         new_user_grant = cls(user, grant, uid)
-        db.session.add(new_user_grant)
-        db.session.commit()
+        cls.add(new_user_grant)
         return new_user_grant

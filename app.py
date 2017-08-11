@@ -9,14 +9,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
-from resources import (
-    AccountAuth,
-    OAuth,
-    Register,
-    ChangePassword,
-    ResetPassword,
-    VerifyEmail
-)
+import resources as res
 
 # Constants
 DB_KEY = 'DATABASE_URL'
@@ -31,12 +24,19 @@ api = Api(app, errors=resource_errors)
 
 JWTManager(app)
 
-api.add_resource(AccountAuth, '/auth')
-api.add_resource(OAuth, '/oauth')
-api.add_resource(Register, '/register')
-api.add_resource(ChangePassword, '/change-password')
-api.add_resource(ResetPassword, '/reset-password')
-api.add_resource(VerifyEmail, '/verify-email')
+# Authentication Resources
+api.add_resource(res.AccountAuth, '/auth')
+api.add_resource(res.OAuth, '/oauth')
+api.add_resource(res.Register, '/register')
+api.add_resource(res.ChangePassword, '/change-password')
+api.add_resource(res.ResetPassword, '/reset-password')
+api.add_resource(res.VerifyEmail, '/verify-email')
+
+# Collection Resources
+api.add_resource(res.Children, '/children')
+
+# Single Entity Resources
+api.add_resource(res.Child, '/child/<int:child_id>')
 
 if __name__ == '__main__':
     from db import db

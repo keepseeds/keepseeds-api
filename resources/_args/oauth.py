@@ -8,6 +8,6 @@ get_oauth_args = {
 }
 
 post_oauth_args = {
-    'grantType': Str(required=True),
+    'grant_type': Str(required=True),
     'token': Str(required=True)
 }

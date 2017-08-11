@@ -75,7 +75,7 @@ class UserToken(db.Model, Base):
         Set the delete_date_time of this UserToken.
         """
         self.delete_date_time = datetime.utcnow()
-        db.session.commit()
+        self.save()
 
     #
     # CLASS METHODS
@@ -148,8 +148,7 @@ class UserToken(db.Model, Base):
 
         token_value = new_user_token.generate_encrypt_token()
 
-        db.session.add(new_user_token)
-        db.session.commit()
+        cls.add(new_user_token)
 
         cls.expire_existing_tokens(user.id, token.id, new_user_token.id)
         return token_value

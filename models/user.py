@@ -81,7 +81,7 @@ class User(db.Model, Base):
         :rtype None
         """
         self.is_locked = is_locked
-        db.session.commit()
+        self.save()
 
     def update_password(self, password):
         """
@@ -92,7 +92,7 @@ class User(db.Model, Base):
         :rtype: bool
         """
         self.encrypt_password(password)
-        db.session.commit()
+        self.save()
         return True
 
     def set_is_verified_email(self, is_verified_email=True):
@@ -103,7 +103,7 @@ class User(db.Model, Base):
         :return:
         """
         self.is_verified_email = is_verified_email
-        db.session.commit()
+        self.save()
 
         return True
 
@@ -159,8 +159,7 @@ class User(db.Model, Base):
         :rtype: dict
         """
         new_user = cls(email, first, last, password)
-        db.session.add(new_user)
-        db.session.commit()
+        cls.add(new_user)
 
         token = Token.find_by_token_type(TokenType.VerifyEmail)
         token_expiry = datetime.utcnow() + timedelta(hours=72)
@@ -184,7 +183,6 @@ class User(db.Model, Base):
         """
         new_user = cls(email, first, last)
         new_user.is_verified_email = True
-        db.session.add(new_user)
-        db.session.commit()
+        cls.add(new_user)
 
         return new_user

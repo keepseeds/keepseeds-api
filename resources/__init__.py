@@ -1,16 +1,19 @@
 """
 Module containing all RESTful API Resources.
 """
-# Security / Generic resources
-from .change_password_resource import ChangePassword
-from .reset_password_resource import ResetPassword
-from .register_resource import Register
-from .account_auth_resource import AccountAuth
-from .oauth_resource import OAuth
-from .verify_email import VerifyEmail
+from .generic import (
+    AccountAuth,
+    ChangePassword,
+    OAuth,
+    Register,
+    ResetPassword,
+    VerifyEmail
+)
 
-# Collection Entity resources
-from .children_resource import Children
+from .collections import (
+    Children
+)
 
-# Single Entity resources
-from .single import Child
+from .entities import (
+    Child
+)

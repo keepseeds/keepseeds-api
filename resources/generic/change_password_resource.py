@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs.flaskparser import use_args
 
 from services import AccountService
-from .args import put_change_password_args
+from resources._args import put_change_password_args
 
 
 class ChangePassword(Resource):
@@ -18,9 +18,9 @@ class ChangePassword(Resource):
     @jwt_required
     @use_args(put_change_password_args)
     def put(self, args):
-        old_password = args['oldPassword']
+        old_password = args['old_password']
         password = args['password']
-        password_confirm = args['passwordConfirm']
+        password_confirm = args['password_confirm']
 
         AccountService.change_password(
             old_password,
