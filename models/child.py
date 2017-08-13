@@ -32,3 +32,11 @@ class Child(db.Model, Base):
         self.gender = gender
         self.created_by = created_by
         self.middle_name = middle_name
+
+    @classmethod
+    def create(cls, first, last, dob, gender, created_by, middle_name=None):
+        new_child = cls(first, last, dob, gender, created_by, middle_name)
+        cls.add(new_child)
+
+        return new_child
+
