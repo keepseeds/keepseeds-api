@@ -1,3 +1,9 @@
+environ:
+  app_secret: 'APP_SECRET'
+  database_url: 'DATABASE_URL'
 facebook_app:
   app_id: ''
   app_secret: ''
+developer_environ:
+  app_secret: 'TEST_SECRET'
+  database_url: 'postgresql://localhost/andy'

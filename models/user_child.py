@@ -12,7 +12,7 @@ class UserChild(db.Model, Base):
     """
 
     # SQLAlchemy Configuration
-    __tablename__ = 'child_users'
+    __tablename__ = 'user_children'
 
     is_primary = db.Column(db.Boolean, nullable=False)
 
