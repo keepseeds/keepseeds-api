@@ -9,7 +9,7 @@ single_child_marshal = {
     'last_name': fields.String,
     'middle_name': fields.String,
     'date_of_birth': custom_fields.ISODate,
-    'gender': fields.Integer,
+    'gender_id': fields.Integer,
     'created_by': fields.Integer,
     'create_date_time': custom_fields.ISODate,
     'update_date_time': custom_fields.ISODate
@@ -21,5 +21,5 @@ list_child_marshal = {
     'first_name': fields.String,
     'last_name': fields.String,
     'middle_name': fields.String,
-    'gender': fields.Integer,
+    'gender_id': fields.Integer,
 }

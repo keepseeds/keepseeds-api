@@ -38,14 +38,14 @@ class Children(Resource):
         first = args['first_name']
         last = args['last_name']
         dob = args['date_of_birth']
-        gender = args['gender']
+        gender_id = args['gender_id']
         middle = args.get('middle_name', None)
 
         result = ChildService.create(
             first=first,
             last=last,
             dob=dob,
-            gender=gender,
+            gender_id=gender_id,
             created_by=get_jwt_identity(),
             middle=middle)
 
