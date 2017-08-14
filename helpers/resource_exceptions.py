@@ -24,14 +24,14 @@ class UnableToCompleteError(HTTPException):
     """
     Generic error message, no specific detail provided.
     """
-    code = 400
+    code = 422
 
 
 class EmailAlreadyExistsError(ResourceError):
     """
     Error thrown when the provided email already exists.
     """
-    code = 400
+    code = 422
 
     def __init__(self, email):
         ResourceError.__init__(self, {'email': email})
@@ -51,7 +51,7 @@ class UserNotFoundError(ResourceError):
     """
     Error thrown when the user could not be found.
     """
-    code = 400
+    code = 422
 
     def __init__(self):
         ResourceError.__init__(self)
@@ -61,7 +61,7 @@ class InvalidTokenError(ResourceError):
     """
     Error thrown when the provided token was not found.
     """
-    code = 400
+    code = 422
 
     def __init__(self, token):
         ResourceError.__init__(self, {'token': token})
@@ -71,14 +71,14 @@ class PasswordsDoNotMatchError(HTTPException):
     """
     Password comparison has failed.
     """
-    code = 400
+    code = 422
 
 
 class UnmetPasswordRequirementsError(ResourceError):
     """
     The provided password and/plus confirmation are not eligible.
     """
-    code = 400
+    code = 422
 
     def __init__(self, data):
         ResourceError.__init__(self, data)
@@ -130,6 +130,15 @@ class PermissionDeniedError(ResourceError):
     def __init__(self, data):
         ResourceError.__init__(self, data)
 
+class GenderNotFoundError(ResourceError):
+    """
+    The provided gender ID does not exist.
+    """
+    code = 422
+
+    def __init__(self, _id):
+        ResourceError.__init__(self, {'id': _id})
+
 #
 # Dictionary of Exception Types
 #
@@ -138,12 +147,12 @@ resource_errors = {
     'UnableToCompleteError': {
         'error_code': 'UNABLE_TO_COMPLETE',
         'message': 'Unable to complete the request.',
-        'status': 400
+        'status': 422
     },
     'PasswordsDoNotMatchError': {
         'error_code': 'NO_PASSWORD_MATCH',
         'message': 'Passwords do not match.',
-        'status': 400
+        'status': 422
     },
     'InvalidCredentialsError': {
         'error_code': 'INVALID_CREDENTIALS',
@@ -153,12 +162,12 @@ resource_errors = {
     'UnmetPasswordRequirementsError': {
         'error_code': 'UNMET_PASSWORD_REQUIREMENTS',
         'message': 'The provided password and/or confirmation are not eligible.',
-        'status': 400
+        'status': 422
     },
     'EmailAlreadyExistsError': {
         'error_code': 'EMAIL_ALREADY_EXISTS',
         'message': 'The provided email is already registered.',
-        'status': 400
+        'status': 422
     },
     'OAuthUserExistsError': {
         'error_code': 'OAUTH_USER_EXISTS',
@@ -168,12 +177,12 @@ resource_errors = {
     'UserNotFoundError': {
         'error_code': 'USER_NOT_FOUND',
         'message': 'Could not find the requested user.',
-        'status': 400
+        'status': 422
     },
     'InvalidTokenError': {
         'error_code': 'INVALID_TOKEN',
         'message': 'Could not find the provided token.',
-        'status': 400
+        'status': 422
     },
     'EmailNotVerifiedError': {
         'error_code': 'EMAIL_NOT_VERIFIED',
@@ -194,6 +203,11 @@ resource_errors = {
         'error_code': 'PERMISSION_DENIED',
         'message': 'The resource requested requires elevated permissions.',
         'status': 401
+    },
+    'GenderNotFoundError': {
+        'error_code': 'GENDER_NOT_FOUND',
+        'message': 'The provided gender ID does not exist.',
+        'status': 422
     }
 }
 
@@ -208,5 +222,6 @@ __all__ = [
     'EmailNotVerifiedError',
     'FacebookInvalidPermissionsError',
     'OAuthUserExistsError',
+    'GenderNotFoundError',
     'resource_errors'
 ]

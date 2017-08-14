@@ -1,6 +1,6 @@
 """Module containing the ChildService definition."""
 
-from models import Child, UserChild, User
+from models import Child, UserChild, User, Gender
 from helpers import resource_exceptions as res_exc
 from .mixins import BaseService
 
@@ -11,7 +11,7 @@ class ChildService(BaseService):
     """
 
     @staticmethod
-    def create(first, last, dob, gender, created_by, middle=None):
+    def create(first, last, dob, gender_id, created_by, middle=None):
         """
         Add a new child.
 
@@ -21,8 +21,8 @@ class ChildService(BaseService):
         :type last: str
         :param dob: Date of Birth of child.
         :type dob: datetime.datetime
-        :param gender: Gender of child.
-        :type gender: int
+        :param gender_id: Gender of child.
+        :type gender_id: int
         :param created_by: User ID of creating user.
         :type created_by: int
         :param middle: [Optional] Middle name of user.
@@ -32,12 +32,16 @@ class ChildService(BaseService):
 
         # Check created_by user is valid.
         user = User.find_by_id(created_by)
-
         if not user:
             raise res_exc.UserNotFoundError
 
+        # Check gender provided is valid.
+        gender = Gender.find_by_id(gender_id)
+        if not gender:
+            raise res_exc.GenderNotFoundError(gender_id)
+
         # Create new child
-        new_child = Child.create(first, last, dob, gender, created_by, middle)
+        new_child = Child.create(first, last, dob, gender_id, created_by, middle)
 
         # Create ChildUser entity using user and child objects, is_primary=True
         new_uc = UserChild.create(user, new_child, True)
