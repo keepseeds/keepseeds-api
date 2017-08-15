@@ -27,3 +27,10 @@ class Base(object):
 
         if is_save:
             cls.save()
+
+    def soft_delete(self, delete_date_time=None):
+        """
+        Mark the calling object as deleted.
+        """
+        self.delete_date_time = delete_date_time if delete_date_time else datetime.utcnow()
+        self.save()

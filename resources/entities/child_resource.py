@@ -24,7 +24,7 @@ class Child(Resource):
         user_id = get_jwt_identity()
         result = ChildService.find_child(_id=child_id, user_id=user_id)
 
-        return result
+        return result, 200
 
 
     @jwt_required
@@ -39,8 +39,12 @@ class Child(Resource):
             'user': get_jwt_identity()
         }
 
+    @jwt_required
     def delete(self, child_id):
         """
         Mark a Child entity as deleted.
         """
-        pass
+        user_id = get_jwt_identity()
+        result = ChildService.delete_child(child_id, user_id)
+
+        return result, 204
