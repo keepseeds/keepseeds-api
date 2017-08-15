@@ -127,8 +127,9 @@ class PermissionDeniedError(ResourceError):
     """
     code = 401
 
-    def __init__(self, data):
-        ResourceError.__init__(self, data)
+    def __init__(self, action, target, identifier):
+        ResourceError.__init__(self, {'action': action, 'target': target, 'id': identifier})
+
 
 class GenderNotFoundError(ResourceError):
     """
