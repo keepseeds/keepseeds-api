@@ -1,7 +1,7 @@
 """Module containing the ChildService definition."""
 
 from models import Child, UserChild, User, Gender
-from helpers import resource_exceptions as res_exc
+from helpers import resource_exceptions as res_exc, data_info_helper
 from .mixins import BaseService
 
 
@@ -52,6 +52,17 @@ class ChildService(BaseService):
         return new_child
 
     @staticmethod
+    def delete_child(_id, user_id):
+        child = ChildService.find_child(_id, user_id)
+
+        if not child.created_by == user_id:
+            raise res_exc.PermissionDeniedError(data_info_helper('delete', 'child', _id))
+
+        child.soft_delete()
+
+        return child.delete_date_time is not None
+
+    @staticmethod
     def find_child(_id, user_id):
         """
         Provided with a child id and user id, find the child.
@@ -72,7 +83,7 @@ class ChildService(BaseService):
             raise res_exc.ChildNotFoundError({'id': _id})
 
         if not any(u for u in child.users if u.user_id == user_id):
-            raise res_exc.PermissionDeniedError({'id': _id})
+            raise res_exc.PermissionDeniedError(data_info_helper('find', 'child', _id))
 
         return child
 
@@ -93,7 +104,11 @@ class ChildService(BaseService):
                 delete_date_time=None
             ).all()  # type: list[UserChild]
 
+        owned = [uc.child for uc in uc_result if uc.is_primary]
+        included = [uc.child for uc in uc_result if not uc.is_primary]
+        all_children = [uc.child for uc in uc_result]
         return {
-            'owned': [uc.child for uc in uc_result if uc.is_primary],
-            'included': [uc.child for uc in uc_result if not uc.is_primary]
+            'owned': [c for c in owned if not c.delete_date_time],
+            'included': [c for c in included if not c.delete_date_time],
+            'deleted': [c for c in all_children if c.delete_date_time is not None]
         }

@@ -25,7 +25,8 @@ class Children(Resource):
 
         return {
             'owned': marshal(result['owned'], list_child_marshal),
-            'included': marshal(result['included'], list_child_marshal)
+            'included': marshal(result['included'], list_child_marshal),
+            'deleted': marshal(result['deleted'], list_child_marshal)
         }, 200
 
     @jwt_required
