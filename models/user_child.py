@@ -31,8 +31,28 @@ class UserChild(db.Model, Base):
 
     @classmethod
     def create(cls, user, child, is_primary=False):
+        """
+
+        :param user:
+        :param child:
+        :param is_primary:
+        :return:
+        """
         new_user_child = cls(user, child, is_primary)
 
         cls.add(new_user_child)
 
         return new_user_child
+
+    @classmethod
+    def find_by_user(cls, user_id):
+        """
+        Provided with a user_id, look up the UserChild entities belonging to this user.
+
+        :param user_id:
+        :rtype: list[UserChild]
+        """
+        return cls.query.filter_by(
+            user_id=user_id,
+            delete_date_time=None
+        ).all()

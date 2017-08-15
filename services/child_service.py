@@ -1,7 +1,7 @@
 """Module containing the ChildService definition."""
 
 from models import Child, UserChild, User, Gender
-from helpers import resource_exceptions as res_exc, data_info_helper
+from helpers import resource_exceptions as res_exc
 from .mixins import BaseService
 
 
@@ -29,7 +29,6 @@ class ChildService(BaseService):
         :type middle: Optional[str]
         :return:
         """
-
         # Check created_by user is valid.
         user = User.find_by_id(created_by)
         if not user:
@@ -52,38 +51,41 @@ class ChildService(BaseService):
         return new_child
 
     @staticmethod
-    def delete_child(_id, user_id):
-        child = ChildService.find_child(_id, user_id)
+    def delete_child(identifier, user_id):
+        """
+        Provided with a child id and user id, mark the child as deleted.
+
+        :param identifier:
+        :param user_id:
+        :return:
+        """
+        child = ChildService.find_child(identifier, user_id)
 
         if not child.created_by == user_id:
-            raise res_exc.PermissionDeniedError(data_info_helper('delete', 'child', _id))
+            raise res_exc.PermissionDeniedError('delete', 'child', identifier)
 
         child.soft_delete()
 
         return child.delete_date_time is not None
 
     @staticmethod
-    def find_child(_id, user_id):
+    def find_child(identifier, user_id):
         """
         Provided with a child id and user id, find the child.
 
-        :param _id: ID of child.
-        :type _id: int
+        :param identifier: ID of child.
+        :type identifier: int
         :param user_id: ID of User.
         :type user_id: int
         :rtype: Child
         """
-        child = Child.query\
-            .filter_by(
-                id=_id,
-                delete_date_time=None
-            ).first()  # type: Child
+        child = Child.find_by_id(identifier)
 
         if not child:
-            raise res_exc.ChildNotFoundError({'id': _id})
+            raise res_exc.ChildNotFoundError({'id': identifier})
 
         if not any(u for u in child.users if u.user_id == user_id):
-            raise res_exc.PermissionDeniedError(data_info_helper('find', 'child', _id))
+            raise res_exc.PermissionDeniedError('find', 'child', identifier)
 
         return child
 
@@ -95,20 +97,8 @@ class ChildService(BaseService):
 
         :param user_id: User's ID to query for children.
         :type user_id: int
-        :rtype: dict
+        :rtype: list[UserChild]
         """
+        user_child_refs = UserChild.find_by_user(user_id)
 
-        uc_result = UserChild.query\
-            .filter_by(
-                user_id=user_id,
-                delete_date_time=None
-            ).all()  # type: list[UserChild]
-
-        owned = [uc.child for uc in uc_result if uc.is_primary]
-        included = [uc.child for uc in uc_result if not uc.is_primary]
-        all_children = [uc.child for uc in uc_result]
-        return {
-            'owned': [c for c in owned if not c.delete_date_time],
-            'included': [c for c in included if not c.delete_date_time],
-            'deleted': [c for c in all_children if c.delete_date_time is not None]
-        }
+        return user_child_refs

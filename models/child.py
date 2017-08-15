@@ -36,7 +36,29 @@ class Child(db.Model, Base):
 
     @classmethod
     def create(cls, first, last, dob, gender_id, created_by, middle_name=None):
+        """
+
+        :param first:
+        :param last:
+        :param dob:
+        :param gender_id:
+        :param created_by:
+        :param middle_name:
+        :return:
+        """
         new_child = cls(first, last, dob, gender_id, created_by, middle_name)
         cls.add(new_child)
 
         return new_child
+
+    @classmethod
+    def find_by_id(cls, identifier):
+        """
+
+        :param identifier:
+        :return:
+        """
+        return cls.query.filter_by(
+            id=identifier,
+            delete_date_time=None
+        ).first()

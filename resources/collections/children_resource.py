@@ -2,13 +2,14 @@
 Module for the ChildrenResource class, this class interacts
 with the database via ChildService.
 """
-from flask_restful import Resource, marshal_with, marshal
+from flask_restful import Resource, marshal_with
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs.flaskparser import use_args
 
+from helpers import marshal_collection
 from services import ChildService
 from resources._args import post_children_args
-from resources._marshallers import list_child_marshal, single_child_marshal
+from resources._marshallers import list_users_children, single_child_marshal
 
 
 class Children(Resource):
@@ -23,11 +24,7 @@ class Children(Resource):
         """
         result = ChildService.find_users_children(get_jwt_identity())
 
-        return {
-            'owned': marshal(result['owned'], list_child_marshal),
-            'included': marshal(result['included'], list_child_marshal),
-            'deleted': marshal(result['deleted'], list_child_marshal)
-        }, 200
+        return marshal_collection(result, list_users_children), 200
 
     @jwt_required
     @marshal_with(single_child_marshal)
