@@ -22,22 +22,22 @@ class Child(Resource):
         Get a specific Child entity.
         """
         user_id = get_jwt_identity()
-        result = ChildService.find_child(_id=child_id, user_id=user_id)
+        result = ChildService.find_child(identifier=child_id, user_id=user_id)
 
         return result, 200
 
 
     @jwt_required
     @use_args(put_child_args)
+    @marshal_with(single_child_marshal)
     def put(self, args, child_id):
         """
         Update a Child entity.
         """
-        return {
-            'child_id': child_id,
-            'args': args,
-            'user': get_jwt_identity()
-        }
+        user_id = get_jwt_identity()
+        result = ChildService.update(child_id, user_id, args)
+
+        return result, 200
 
     @jwt_required
     def delete(self, child_id):

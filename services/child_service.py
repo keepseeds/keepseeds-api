@@ -50,8 +50,8 @@ class ChildService(BaseService):
 
         return new_child
 
-    @staticmethod
-    def delete_child(identifier, user_id):
+    @classmethod
+    def delete_child(cls, identifier, user_id):
         """
         Provided with a child id and user id, mark the child as deleted.
 
@@ -59,7 +59,7 @@ class ChildService(BaseService):
         :param user_id:
         :return:
         """
-        child = ChildService.find_child(identifier, user_id)
+        child = cls.find_child(identifier, user_id)
 
         if not child.created_by == user_id:
             raise res_exc.PermissionDeniedError('delete', 'child', identifier)
@@ -102,3 +102,33 @@ class ChildService(BaseService):
         user_child_refs = UserChild.find_by_user(user_id)
 
         return user_child_refs
+
+    @classmethod
+    def update(cls, child_id, user_id, updated):
+
+        if not updated:
+            raise res_exc.NothingChangedError
+
+        child = cls.find_child(child_id, user_id)
+
+        if 'first_name' in updated:
+            child.first_name = updated['first_name']
+
+        if 'last_name' in updated:
+            child.last_name = updated['last_name']
+
+        if 'gender_id' in updated:
+            gender = Gender.find_by_id(updated['gender_id'])
+            if not gender:
+                raise res_exc.GenderNotFoundError(updated['gender_id'])
+            child.gender = gender
+
+        if 'date_of_birth' in updated:
+            child.date_of_birth = updated['date_of_birth']
+
+        if 'middle_name' in updated:
+            child.middle_name = updated['middle_name']
+
+        child.save()
+
+        return child

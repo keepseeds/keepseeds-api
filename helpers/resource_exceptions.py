@@ -140,6 +140,15 @@ class GenderNotFoundError(ResourceError):
     def __init__(self, _id):
         ResourceError.__init__(self, {'id': _id})
 
+class NothingChangedError(HTTPException):
+    """
+    The action did not affect any resource.
+    """
+    code = 422
+
+    def __init__(self):
+        HTTPException.__init__(self)
+
 #
 # Dictionary of Exception Types
 #
@@ -208,6 +217,11 @@ resource_errors = {
     'GenderNotFoundError': {
         'error_code': 'GENDER_NOT_FOUND',
         'message': 'The provided gender ID does not exist.',
+        'status': 422
+    },
+    'NothingChangedError': {
+        'error_code': 'NOTHING_CHANGED',
+        'message': 'The action did not affect any resource.',
         'status': 422
     }
 }

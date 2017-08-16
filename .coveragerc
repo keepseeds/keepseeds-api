@@ -5,3 +5,4 @@ omit =
     app.py
     db.py
     run.py
+    manage.py
