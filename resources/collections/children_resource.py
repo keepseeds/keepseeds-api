@@ -47,4 +47,4 @@ class Children(Resource):
             created_by=get_jwt_identity(),
             middle=middle)
 
-        return result, 201
+        return result, 201, {'Location': '/child/{}'.format(result.id)}
