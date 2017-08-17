@@ -212,7 +212,7 @@ class AccountService(object):
             raise res_exc.InvalidCredentialsError
 
         # Look up user id locally in user_grants.
-        user_grant = UserGrant.find_by_uid(grant.id, user_detail['user_id'])
+        user_grant = UserGrant.find_by_uid(grant.id, user_detail['id'])
         if not user_grant:
             user = User.find_by_email(user_detail['email'])
 
@@ -225,7 +225,7 @@ class AccountService(object):
                 first=user_detail['first_name'],
                 last=user_detail['last_name'])
 
-            user_grant = UserGrant.create(user, grant, user_detail['user_id'])
+            user_grant = UserGrant.create(user, grant, user_detail['id'])
 
         # Finally, return an access token using get_access_token 
         # and our local user id.
