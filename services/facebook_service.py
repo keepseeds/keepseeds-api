@@ -22,7 +22,7 @@ class FacebookService(object):
         :type token: str
         :rtype: dict
         """
-        graph = cls.__get_graph()
+        graph = cls.get_graph()
 
         try:
             debug_result = graph.get_object('debug_token', input_token=token)
@@ -41,7 +41,7 @@ class FacebookService(object):
         return user_result
 
     @staticmethod
-    def __get_graph():
+    def get_graph():
         """
         Return a new instance of the Facebook Graph API using the app creds.
         """
