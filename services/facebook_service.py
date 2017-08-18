@@ -35,7 +35,7 @@ class FacebookService(object):
             id=debug_result['data']['user_id'],
             fields='first_name,last_name,email'
         )
-        if not user_result['email']:
+        if not 'email' in user_result:
             raise res_exc.FacebookInvalidPermissionsError('email')
 
         return user_result
@@ -45,8 +45,8 @@ class FacebookService(object):
         """
         Return a new instance of the Facebook Graph API using the app creds.
         """
-        app_id = os.environ.get('FACEBOOK_APP_ID')
-        app_secret = os.environ.get('FACEBOOK_APP_SECRET')
+        app_id = os.environ.get('FACEBOOK_APP_ID', None)
+        app_secret = os.environ.get('FACEBOOK_APP_SECRET', None)
 
         if not app_id and not app_secret:
             # No environment variables, use yaml file instead.
@@ -56,7 +56,7 @@ class FacebookService(object):
                     app_id = config['facebook_app']['app_id']
                     app_secret = config['facebook_app']['app_secret']
                 except yaml.YAMLError as exc:
-                    print(exc)
+                    raise res_exc.UnableToCompleteError
 
         return facebook.GraphAPI(
             access_token='{}|{}'.format(app_id, app_secret),
