@@ -1,4 +1,4 @@
-from resources._args.reset_password import post_reset_password_args, put_reset_password_args
+from resources.args.reset_password import post_reset_password_args, put_reset_password_args
 
 def test__post_reset_password_args__keys():
     assert len(post_reset_password_args.keys()) == 4
