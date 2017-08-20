@@ -1,4 +1,4 @@
-from resources._args.oauth import post_oauth_args
+from resources.args.oauth import post_oauth_args
 
 """
 {

@@ -1,4 +1,4 @@
-from resources._args.child import put_child_args
+from resources.args.child import put_child_args
 
 """
 {

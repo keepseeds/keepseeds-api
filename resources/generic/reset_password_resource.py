@@ -3,7 +3,7 @@ from flask_restful import Resource
 from webargs.flaskparser import use_args
 
 from services import AccountService
-from resources._args import put_reset_password_args, post_reset_password_args
+from ..args import put_reset_password_args, post_reset_password_args
 
 
 class ResetPassword(Resource):

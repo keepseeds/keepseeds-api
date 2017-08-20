@@ -1,4 +1,4 @@
-from resources._args.change_password import put_change_password_args
+from resources.args.change_password import put_change_password_args
 
 def test__put_change_password_args__keys():
     assert len(put_change_password_args.keys()) == 3

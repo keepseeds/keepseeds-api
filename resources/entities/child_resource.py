@@ -5,10 +5,10 @@ from flask_restful import Resource, marshal_with
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from webargs.flaskparser import use_args
 
-
 from services import ChildService
-from resources._args import put_child_args
-from resources._marshallers import single_child_marshal
+from ..args import patch_child_args
+from ..marshals import single_child_marshal
+
 
 class Child(Resource):
     """
@@ -26,11 +26,10 @@ class Child(Resource):
 
         return result, 200
 
-
     @jwt_required
-    @use_args(put_child_args)
+    @use_args(patch_child_args)
     @marshal_with(single_child_marshal)
-    def put(self, args, child_id):
+    def patch(self, args, child_id):
         """
         Update a Child entity.
         """

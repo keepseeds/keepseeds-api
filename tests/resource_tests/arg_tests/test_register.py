@@ -1,4 +1,4 @@
-from resources._args.register import post_register_args
+from resources.args.register import post_register_args
 
 """
 {

@@ -8,8 +8,8 @@ from webargs.flaskparser import use_args
 
 from helpers import marshal_collection
 from services import ChildService
-from resources._args import post_children_args
-from resources._marshallers import list_users_children, single_child_marshal
+from ..args import post_children_args
+from ..marshals import list_users_children, single_child_marshal
 
 
 class Children(Resource):

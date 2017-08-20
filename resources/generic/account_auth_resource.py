@@ -6,7 +6,7 @@ from flask_restful import Resource
 from webargs.flaskparser import use_args
 
 from services import AccountService
-from resources._args import post_account_auth_args
+from ..args import post_account_auth_args
 
 
 class AccountAuth(Resource):

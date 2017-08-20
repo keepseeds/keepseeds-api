@@ -1,4 +1,4 @@
-from resources._args.verify_email import post_verify_email_args
+from resources.args.verify_email import post_verify_email_args
 
 """
 {
