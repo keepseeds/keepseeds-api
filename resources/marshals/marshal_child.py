@@ -1,6 +1,6 @@
 
 from flask_restful import fields
-import custom_fields
+from resources.marshals import custom_fields
 
 # For a single child, return all relevant fields.
 single_child_marshal = {
