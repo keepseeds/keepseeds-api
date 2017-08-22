@@ -14,3 +14,15 @@ def marshal_collection(collection, fields):
     :rtype: Union[OrderedDict, list]
     """
     return marshal(collection, fields, envelope='data')
+
+def get_token_url(path, email, token):
+    """
+    Get website URL for token.
+    """
+    root = 'http://keepseeds.com' # TODO: Get from environ.
+    return '{root}/{path}/{email}?token={token}'.format(
+        root=root,
+        path=path,
+        email=email,
+        token=token
+    )

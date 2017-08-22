@@ -166,7 +166,7 @@ class User(db.Model, Base):
 
         verify_email_token = UserToken.create(new_user, token, token_expiry)
 
-        return {"token": verify_email_token}
+        return verify_email_token
 
     @classmethod
     def create_oauth(cls, email, first, last):

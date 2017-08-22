@@ -1,8 +1,9 @@
 """Module containing the AccountService definition."""
 
+from mailer import send_template_email
 from models import User, Token, UserToken, Grant, UserGrant
 from models.enums import TokenType
-from helpers import resource_exceptions as res_exc
+from helpers import resource_exceptions as res_exc, get_token_url
 from .utils import get_access_token, validate_password, validate_oauth_token
 
 
@@ -27,7 +28,7 @@ class AccountService(object):
         :type password_confirm: str
         :rtype: str
         """
-        # Look up the user, if it exists, check if email is registered 
+        # Look up the user, if it exists, check if email is registered
         # via OAuth.
         user = User.find_by_email(email)
         if user:
@@ -38,9 +39,16 @@ class AccountService(object):
         validate_password(password, password_confirm)
 
         # Create a new user, and return the object.
-        create_user_result = User.create(email, first, last, password)
+        verify_email_token = User.create(email, first, last, password)
 
-        return create_user_result
+        # Send email
+        verify_url = get_token_url('verify-email', user.email, verify_email_token)
+        send_template_email('verify_email', user.email,
+                            first_name=user.first_name,
+                            last_name=user.last_name,
+                            verify_url=verify_url)
+
+        return True
 
     @staticmethod
     def verify_email(email, token):
@@ -131,7 +139,14 @@ class AccountService(object):
         if not new_user_token_id:
             raise res_exc.UnableToCompleteError
 
-        return {'userTokenId': new_user_token_id}
+        # Send email
+        reset_url = get_token_url('reset-password', user.email, new_user_token_id)
+        send_template_email('reset_password', user.email,
+                            first_name=user.first_name,
+                            last_name=user.last_name,
+                            reset_url=reset_url)
+
+        return True
 
     @classmethod
     def resolve_password_reset(cls, email, password, password_confirm, token):
@@ -227,6 +242,6 @@ class AccountService(object):
 
             user_grant = UserGrant.create(user, grant, user_detail['id'])
 
-        # Finally, return an access token using get_access_token 
+        # Finally, return an access token using get_access_token
         # and our local user id.
         return get_access_token(user_grant.user_id)

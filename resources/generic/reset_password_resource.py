@@ -38,8 +38,6 @@ class ResetPassword(Resource):
     def put(self, args):
         email = args['email']
 
-        result = AccountService.request_password_reset(email)
+        AccountService.request_password_reset(email)
 
-        # This currently returns the plain token but it will need to
-        # send it as an email to the user.
-        return result, 202
+        return {'msg': 'Done'}, 204

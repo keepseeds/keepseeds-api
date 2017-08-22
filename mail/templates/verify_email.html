@@ -1,0 +1,13 @@
+{% extends "account_template.html" %}
+{% block main %}
+    <h3>Please verify your email.</h3>
+    <p>
+        Hi {{ first_name }} {{ last_name }}! Thanks for registering with Keepseeds. 
+        For security reasons we require you verify your email address, to do this 
+        simply click the link below:
+    </p>
+    <a href="{{ verify_url }}" title="Verify Email">
+        Verify Email
+    </a>
+    <p>Thanks! The Keepseeds Team.</p>
+{% endblock %}

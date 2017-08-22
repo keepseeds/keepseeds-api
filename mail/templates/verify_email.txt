@@ -1,0 +1,15 @@
+{% extends "account_template.txt" %}
+{% block main %}
+Please verify your email.
+-------------------------
+
+Hi {{ first_name }} {{ last_name }}! Thanks for registering with Keepseeds. 
+For security reasons we require you verify your email address, to do this 
+please copy and paste the link below in to your browser:
+
+---------------
+{{ verify_url }}
+---------------
+
+Thanks! The Keepseeds Team.
+{% endblock %}
